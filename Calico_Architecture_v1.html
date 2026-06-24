@@ -32,6 +32,14 @@
   .tiertoggle button:last-child{border-right:none}
   .tiertoggle button.on{background:rgba(250,140,25,.16);color:#FFD9AC}
   .tier-note{font-size:10.5px;color:var(--feature);max-width:440px;text-align:center;line-height:1.5}
+  .tier-links{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;margin-top:9px}
+  .tier-links a{font-size:11px;color:var(--line-bright);text-decoration:none;border-bottom:1px solid rgba(154,184,255,.3);padding-bottom:1px;letter-spacing:.02em;transition:color .2s,border-color .2s}
+  .tier-links a:hover{color:#C2D5FF;border-color:var(--line-bright)}
+  .tier-links a.cta{color:#FFD9AC;border-color:rgba(250,140,25,.45)}
+  .tier-links a.cta:hover{color:#FFE7C9;border-color:var(--amber)}
+  /* tier toggle: briefly glow components that just became visible */
+  @keyframes revealGlow{0%{filter:drop-shadow(0 0 13px var(--amber-soft))}100%{filter:drop-shadow(0 0 0 rgba(250,140,25,0))}}
+  .comp.reveal .cbox{animation:revealGlow 1.5s ease-out}
 
   .stage{position:absolute;inset:0;z-index:10}
   .diagram-wrap{position:absolute;left:24px;right:24px;top:166px;bottom:172px}
@@ -133,26 +141,26 @@
     marker-end:url(#flowHeadHot);filter:drop-shadow(0 0 5px var(--amber-soft))}
 
   /* walkthrough control bar (bottom-center) */
-  .wtbar{position:absolute;left:50%;transform:translateX(-50%);bottom:18px;z-index:45;
-    width:min(720px,calc(100% - 80px));background:rgba(28,32,40,.94);border:1px solid rgba(140,150,170,.2);
-    border-radius:14px;padding:13px 18px;backdrop-filter:blur(6px);box-shadow:0 10px 36px rgba(8,10,14,.5)}
-  .wt-intro{text-align:center;font-size:11.5px;color:var(--feature);margin-bottom:10px;letter-spacing:.01em}
+  .wtbar{position:absolute;left:50%;transform:translateX(-50%);bottom:20px;z-index:45;
+    width:min(900px,calc(100% - 56px));background:rgba(28,32,40,.96);border:1px solid rgba(140,150,170,.24);
+    border-radius:16px;padding:17px 26px 19px;backdrop-filter:blur(6px);box-shadow:0 12px 40px rgba(8,10,14,.55)}
+  .wt-intro{text-align:center;font-size:13px;color:var(--feature);margin-bottom:14px;letter-spacing:.01em}
   .wt-intro b{color:#FFD9AC;font-weight:600}
-  .wt-journeys{display:flex;gap:8px;justify-content:center;margin-bottom:11px}
-  .wt-j{flex:0 1 auto;padding:6px 13px;border-radius:8px;border:1px solid rgba(140,150,170,.24);
-    background:transparent;color:var(--subtitle);font-size:11.5px;font-weight:600;cursor:pointer;
+  .wt-journeys{display:flex;gap:11px;justify-content:center;margin-bottom:15px}
+  .wt-j{flex:0 1 auto;padding:9px 18px;border-radius:9px;border:1px solid rgba(140,150,170,.26);
+    background:transparent;color:var(--subtitle);font-size:13px;font-weight:600;cursor:pointer;
     letter-spacing:.01em;transition:background .2s,color .2s,border-color .2s}
   .wt-j:hover{color:var(--label);border-color:rgba(154,184,255,.5)}
   .wt-j.on{background:rgba(250,140,25,.14);border-color:var(--amber);color:#FFD9AC}
-  .wt-controls{display:flex;align-items:center;justify-content:center;gap:10px}
-  .wt-btn{padding:7px 16px;border-radius:8px;border:1px solid rgba(140,150,170,.28);background:transparent;
-    color:var(--subtitle);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .2s}
+  .wt-controls{display:flex;align-items:center;justify-content:center;gap:14px}
+  .wt-btn{padding:9px 21px;border-radius:9px;border:1px solid rgba(140,150,170,.3);background:transparent;
+    color:var(--subtitle);font-size:13.5px;font-weight:600;cursor:pointer;transition:all .2s}
   .wt-btn:hover:not(:disabled){color:var(--label);border-color:rgba(140,150,170,.55)}
   .wt-btn.primary{border-color:var(--amber);background:rgba(250,140,25,.14);color:#FFD9AC}
   .wt-btn.primary:hover:not(:disabled){background:rgba(250,140,25,.24)}
   .wt-btn:disabled{opacity:.4;cursor:default}
-  .wt-count{font-size:11px;color:var(--feature);min-width:74px;text-align:center;letter-spacing:.02em}
-  .wt-cap{margin-top:11px;font-size:12.5px;line-height:1.55;color:var(--subtitle);text-align:center;min-height:38px}
+  .wt-count{font-size:12.5px;color:var(--feature);min-width:86px;text-align:center;letter-spacing:.02em}
+  .wt-cap{margin-top:15px;font-size:14.5px;line-height:1.6;color:var(--subtitle);text-align:center;min-height:44px}
   .wt-cap b{color:var(--label);font-weight:600}
   .wt-nudge{display:block;margin-top:8px;font-size:11.5px;color:var(--ok)}
   .wt-nudge a{color:#FFD9AC;text-decoration:none;border-bottom:1px solid rgba(255,217,172,.4);padding-bottom:1px}
@@ -176,13 +184,13 @@
       <button data-tier="cloud">Cloud</button>
     </div>
     <div class="tier-note" id="tierNote"></div>
+    <div class="tier-links" id="tierLinks"></div>
   </div>
 
   <div class="stage">
     <div class="diagram-wrap">
       <svg class="arch" id="arch" viewBox="0 0 900 720" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
     </div>
-    <div class="click-hint">&#10024; Click any component to learn what it does</div>
     <div class="panel hidden" id="panel"></div>
     <div class="legend">
       <div class="lg-title">Legend</div>
@@ -237,10 +245,10 @@ var COMPONENTS={
   csi:{name:"csi-node-driver",where:"DaemonSet \u00b7 every node",core:false,tier:"oss",
     role:"Calico's CSI node driver. Provides the ephemeral volumes some Calico components use (for example, mounting the per-node socket the dataplane needs). Installed by the operator on every node.",
     doc:"https://docs.tigera.io/calico/latest/reference/installation/api"},
-  goldmane:{name:"Goldmane",where:"Deployment \u00b7 cluster-wide (observability)",core:false,tier:"oss",
+  goldmane:{name:"Goldmane",where:"Deployment \u00b7 cluster-wide (observability)",core:false,tier:"oss",ossOnly:true,
     role:"The flow-logs aggregation API (3.30+). Collects and serves flow data that powers the open-source flow logs API and the Whisker console \u2014 network-flow visibility without a commercial license.",
     doc:"https://docs.tigera.io/calico/latest/observability"},
-  whisker:{name:"Whisker",where:"Deployment \u00b7 cluster-wide (observability UI)",core:false,tier:"oss",
+  whisker:{name:"Whisker",where:"Deployment \u00b7 cluster-wide (observability UI)",core:false,tier:"oss",ossOnly:true,
     role:"Calico's open-source web console (3.30+). Reads aggregated flows from Goldmane so you can see what's talking to what \u2014 the flow visualizer and Whisker UI ship free in Calico Open Source.",
     doc:"https://docs.tigera.io/calico/latest/observability"},
   // Enterprise / Cloud commercial components (shown when tier selected) — placeholders, full overlay next pass
@@ -265,7 +273,15 @@ var CRDS=[
 var TIER_NOTES={
   oss:"Free & open source: best-in-class pod networking, full NetworkPolicy, and OSS observability \u2014 flow logs API, the Whisker web console, and the flow visualizer. In-memory data, unlimited clusters, community support.",
   enterprise:"Self-managed platform. Adds DNS/FQDN policy, hierarchical tiered policy, IDS/IPS, DPI, WAF, DDoS protection, compliance reporting, SIEM integration, egress gateway, cluster mesh & multi-cluster management on top of OSS. (Full feature overlay next pass.)",
-  cloud:"Fully-managed SaaS \u2014 Tigera runs the control plane. Same security & observability stack as Enterprise, delivered as a service, with 7-day data retention and unlimited clusters/users. (A free single-cluster tier also exists.)"
+  cloud:"Fully-managed SaaS \u2014 Tigera runs the control plane. Same security & observability stack as Enterprise, delivered as a service, with 7-day data retention. A no-cost Calico Cloud Free Tier covers a single cluster."
+};
+
+/* per-tier links + primary CTA (docs are the source of truth for edition naming) */
+var EDITIONS_DOC="https://docs.tigera.io/calico/latest/about/calico-product-editions";
+var TIER_LINKS={
+  oss:[{t:"Get Calico Open Source",u:"https://docs.tigera.io/calico/latest/getting-started/",cta:true},{t:"Compare editions",u:EDITIONS_DOC}],
+  enterprise:[{t:"Book a demo",u:"https://www.tigera.io/demo/",cta:true},{t:"Compare editions",u:EDITIONS_DOC},{t:"Contact us",u:"https://www.tigera.io/contact/"}],
+  cloud:[{t:"Start free \u2014 Calico Cloud Free Tier",u:"https://www.calicocloud.io/?code=free",cta:true},{t:"Compare editions",u:EDITIONS_DOC},{t:"Contact us",u:"https://www.tigera.io/contact/"}]
 };
 
 var arch=$("arch");
@@ -323,7 +339,7 @@ function clink(g,a,b,opts){
   if(!opts.noArrow)p.setAttribute("marker-end", opts.bgp?"url(#flowHeadGreen)":"url(#flowHead)");
   g.appendChild(p);p._len=p.getTotalLength();
   if(opts.tag){var mx=(x1+x2)/2,mty=(opts.midY!=null?opts.midY:(y1+y2)/2)-6;
-    var t=el("text",{x:mx,y:mty},"link-tag");t.textContent=opts.tag;g.appendChild(t);}
+    var t=el("text",{x:mx,y:mty},"link-tag");t.textContent=opts.tag;g.appendChild(t);p._tag=t;}
   if(!opts.noPacket)packets.push({path:p,len:p._len,t:Math.random()});
   p._a=a;p._b=b;p._key=(opts.key||null);
   return p;
@@ -348,9 +364,11 @@ var lastTs=0;
 function tick(ts){
   if(!lastTs)lastTs=ts;var dt=Math.min(60,ts-lastTs);lastTs=ts;
   packets.forEach(function(pk){
+    if(pk._hide){ if(pk.dot)pk.dot.style.display="none"; return; }
     pk.t+=0.00009*dt; if(pk.t>1)pk.t-=1;
     var pt=pk.path.getPointAtLength(pk.t*pk.len);
     if(!pk.dot){pk.dot=el("circle",{r:3},"cpacket");arch.appendChild(pk.dot);}
+    pk.dot.style.display="";
     pk.dot.setAttribute("cx",pt.x.toFixed(1));pk.dot.setAttribute("cy",pt.y.toFixed(1));
   });
   rafId=requestAnimationFrame(tick);
@@ -394,14 +412,28 @@ function applyTier(tier){
   });
   $("tierNote").textContent=TIER_NOTES[tier];
   var anyComm=(tier!=="oss");
-  // hide commercial components on OSS; surface them on Enterprise/Cloud (full overlay next pass)
+  // visibility per tier: OSS-only comps (Whisker/Goldmane) show only on OSS;
+  // commercial comps show only on Enterprise/Cloud; everything else is always on.
   Array.prototype.forEach.call(arch.querySelectorAll(".comp"),function(n){
     var c=COMPONENTS[n.getAttribute("data-key")];
     if(!c)return;
-    if(c.tier!=="oss"){ n.style.display=anyComm?"":"none"; }
+    var show=true;
+    if(c.ossOnly){ show=!anyComm; }
+    else if(c.tier!=="oss"){ show=anyComm; }
+    var wasHidden=(n.style.display==="none");
+    n.style.display=show?"":"none";
+    if(show&&wasHidden){ n.classList.add("reveal"); (function(el){setTimeout(function(){el.classList.remove("reveal");},1500);})(n); }
   });
+  // OSS observability band + its flow link/packet are OSS-only too
+  var obs=arch.querySelector(".oss-obs-band");
+  if(obs)obs.style.display=anyComm?"none":"";
+  if(LINKS.goldWhisk){LINKS.goldWhisk.style.display=anyComm?"none":"";if(LINKS.goldWhisk._tag)LINKS.goldWhisk._tag.style.display=anyComm?"none":"";}
+  packets.forEach(function(pk){ if(pk.path===LINKS.goldWhisk){ pk._hide=anyComm; if(pk.dot)pk.dot.style.display=anyComm?"none":""; } });
   var cl=arch.querySelector(".comm-label");
   if(cl)cl.style.display=anyComm?"":"none";
+  // per-tier links + CTA
+  var tl=$("tierLinks");
+  if(tl)tl.innerHTML=(TIER_LINKS[tier]||[]).map(function(l){return '<a class="'+(l.cta?'cta':'')+'" href="'+l.u+'" target="_blank" rel="noopener">'+l.t+'</a>';}).join('');
 }
 
 /* ---- WALKTHROUGH: two journeys that trace how Calico works ---- */
@@ -542,7 +574,7 @@ function build(){
   var ds=datastore(arch,760,219,150,52);
 
   // Observability band (OSS since 3.30) — Goldmane + Whisker
-  boundary(arch,44,308,400,120,"bound-ctl","Observability (open source, 3.30+)","");
+  var obsBand=boundary(arch,44,308,400,120,"bound-ctl","Observability (open source, 3.30+)","");obsBand.classList.add("oss-obs-band");
   var goldmane=comp(arch,"goldmane",150,372,150,44);
   var whisker=comp(arch,"whisker",330,372,150,44);
 
