@@ -118,7 +118,8 @@
   .pulse{fill:none;stroke:var(--trace-bright);stroke-width:2;stroke-linecap:round;stroke-dasharray:7 93;stroke-dashoffset:100;filter:drop-shadow(0 0 3px var(--trace-bright))}
   @media (prefers-reduced-motion:no-preference){.pulse{animation:flow linear infinite}}
   @keyframes flow{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
-  .endpoint{position:absolute;transform:translate(-50%,-50%);text-align:center;opacity:0;transition:opacity .4s}
+  /* anchor the DOT (first child, 11px) on the trace end at (dotx,it.y); label hangs below */
+  .endpoint{position:absolute;transform:translate(-50%,-5.5px);text-align:center;opacity:0;transition:opacity .4s}
   #app.focus .endpoint{opacity:1;transition-delay:.85s}
   .dot{width:11px;height:11px;border-radius:50%;background:var(--trace-bright);box-shadow:0 0 9px var(--trace-bright);margin:0 auto}
   .ep-label{color:var(--label);font-size:14px;font-weight:600;white-space:nowrap;margin-top:7px}
