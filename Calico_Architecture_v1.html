@@ -51,19 +51,19 @@
   .comp:hover .cbox{fill:rgba(56,92,160,.95);filter:drop-shadow(0 0 7px rgba(91,141,239,.5))}
   .comp.sel .cbox{stroke:var(--amber);stroke-width:2;filter:drop-shadow(0 0 9px var(--amber-soft))}
   .comp.optional .cbox{fill:rgba(40,55,95,.55);stroke:rgba(120,140,200,.5);stroke-dasharray:5 4}
-  .comp .ctitle{fill:#EAF1FF;font-size:12.5px;font-weight:700;text-anchor:middle;pointer-events:none}
-  .comp .csub{fill:#9DB8E8;font-size:9px;text-anchor:middle;pointer-events:none}
+  .comp .ctitle{fill:#EAF1FF;font-size:15px;font-weight:700;text-anchor:middle;pointer-events:none}
+  .comp .csub{fill:#9DB8E8;font-size:10.5px;text-anchor:middle;pointer-events:none}
   .comp.optional .ctitle{fill:#B9C7E8}
-  .opt-tag{fill:var(--feature);font-size:8px;text-anchor:middle;letter-spacing:.08em;text-transform:uppercase}
+  .opt-tag{fill:var(--feature);font-size:9.5px;text-anchor:middle;letter-spacing:.08em;text-transform:uppercase}
 
   /* datastore = hero */
   .datastore{cursor:pointer}
   .datastore .dbox{fill:rgba(70,55,110,.92);stroke:var(--crd);stroke-width:1.8;transition:filter .2s}
   .datastore:hover .dbox{filter:drop-shadow(0 0 12px rgba(199,169,220,.55))}
   .datastore.sel .dbox{stroke:var(--amber);filter:drop-shadow(0 0 12px var(--amber-soft))}
-  .datastore .dtitle{fill:#F0E8FA;font-size:13px;font-weight:700;text-anchor:middle;pointer-events:none}
-  .datastore .dsub{fill:#C9B8E0;font-size:9px;text-anchor:middle;pointer-events:none}
-  .ds-hint{fill:var(--crd);font-size:9.5px;text-anchor:middle;font-weight:600;letter-spacing:.02em;
+  .datastore .dtitle{fill:#F0E8FA;font-size:15.5px;font-weight:700;text-anchor:middle;pointer-events:none}
+  .datastore .dsub{fill:#C9B8E0;font-size:10.5px;text-anchor:middle;pointer-events:none}
+  .ds-hint{fill:var(--crd);font-size:11px;text-anchor:middle;font-weight:600;letter-spacing:.02em;
     opacity:.85;animation:pulse 2.4s ease-in-out infinite}
   @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
 
@@ -72,14 +72,14 @@
   .bound-cluster{stroke:rgba(120,150,220,.5)}
   .bound-node{stroke:rgba(157,180,224,.55);fill:rgba(40,46,62,.5)}
   .bound-ctl{stroke:rgba(199,169,220,.45);fill:rgba(50,42,72,.28)}
-  .bound-title{fill:var(--label);font-size:12.5px;font-weight:600;letter-spacing:.03em}
-  .bound-sub{fill:var(--feature);font-size:10px;letter-spacing:.02em}
+  .bound-title{fill:var(--label);font-size:14.5px;font-weight:600;letter-spacing:.03em}
+  .bound-sub{fill:var(--feature);font-size:11px;letter-spacing:.02em}
 
   /* control-flow links + packets */
   .clink{fill:none;stroke:var(--line);stroke-width:1.4;stroke-linecap:round;stroke-opacity:.4}
   .clink.bgp{stroke:var(--ok);stroke-dasharray:5 4}
   .cpacket{fill:var(--line-bright);filter:drop-shadow(0 0 4px var(--line-bright))}
-  .link-tag{fill:var(--feature);font-size:8.5px;text-anchor:middle;letter-spacing:.02em}
+  .link-tag{fill:var(--feature);font-size:11px;text-anchor:middle;letter-spacing:.02em}
 
   /* detail / CRD side panel */
   .panel{position:absolute;top:166px;right:24px;width:320px;bottom:172px;z-index:46;
@@ -118,6 +118,16 @@
   .legend .sw.core{background:rgba(56,92,160,.95);border:1px solid var(--k8s)}
   .legend .sw.opt{background:rgba(40,55,95,.55);border:1px dashed rgba(120,140,200,.6)}
   .legend .sw.ds{background:rgba(70,55,110,.92);border:1px solid var(--crd)}
+
+  /* detail toggle (Core / + Advanced) — mirrors the legend on the left */
+  .detailtoggle{position:absolute;left:30px;top:152px;z-index:40;display:flex;align-items:center;gap:8px;
+    background:rgba(28,32,40,.55);border:1px solid rgba(140,150,170,.12);border-radius:10px;padding:7px 9px;opacity:.85;transition:opacity .25s}
+  .detailtoggle:hover{opacity:1}
+  .detailtoggle .dt-h{font-size:9.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--feature)}
+  .detailtoggle button{padding:5px 11px;border:1px solid rgba(140,150,170,.26);border-radius:7px;background:transparent;
+    color:var(--subtitle);font-size:11.5px;font-weight:600;cursor:pointer;letter-spacing:.02em;transition:background .2s,color .2s,border-color .2s}
+  .detailtoggle button:hover{color:var(--label);border-color:rgba(154,184,255,.5)}
+  .detailtoggle button.on{background:rgba(250,140,25,.16);border-color:var(--amber);color:#FFD9AC}
 
   /* clickable cue on components */
   .comp .cbox,.datastore .dbox{transition:fill .2s,stroke .2s,filter .2s,transform .15s}
@@ -189,9 +199,14 @@
 
   <div class="stage">
     <div class="diagram-wrap">
-      <svg class="arch" id="arch" viewBox="0 0 900 720" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+      <svg class="arch" id="arch" viewBox="0 0 1300 460" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
     </div>
     <div class="panel hidden" id="panel"></div>
+    <div class="detailtoggle" id="detailtoggle">
+      <span class="dt-h">View</span>
+      <button class="on" data-detail="core">Core</button>
+      <button data-detail="all">+ Advanced</button>
+    </div>
     <div class="legend">
       <div class="lg-title">Legend</div>
       <div class="lg"><span class="sw core"></span>Core component</div>
@@ -405,35 +420,44 @@ function selectDatastore(grp){
   p.innerHTML=html;
 }
 
-/* ---- tier selector ---- */
-function applyTier(tier){
-  Array.prototype.forEach.call(document.querySelectorAll("#tiertoggle button"),function(b){
-    b.classList.toggle("on",b.getAttribute("data-tier")===tier);
-  });
-  $("tierNote").textContent=TIER_NOTES[tier];
-  var anyComm=(tier!=="oss");
-  // visibility per tier: OSS-only comps (Whisker/Goldmane) show only on OSS;
-  // commercial comps show only on Enterprise/Cloud; everything else is always on.
+/* ---- tier + detail selectors (combined visibility engine) ---- */
+var ADV={bird:1,confd:1,csi:1,dikastes:1,goldmane:1,whisker:1}; // live behind the "+ Advanced" toggle
+var curTier="oss", curDetail="core";
+function tierOK(c){ if(c.ossOnly)return curTier==="oss"; if(c.tier!=="oss")return curTier!=="oss"; return true; }
+function gateLink(link,on){
+  if(!link)return;
+  link.style.display=on?"":"none";
+  if(link._tag)link._tag.style.display=on?"":"none";
+  packets.forEach(function(pk){ if(pk.path===link){ pk._hide=!on; if(pk.dot)pk.dot.style.display=on?"":"none"; } });
+}
+function refreshVisibility(){
+  var anyComm=(curTier!=="oss");
   Array.prototype.forEach.call(arch.querySelectorAll(".comp"),function(n){
-    var c=COMPONENTS[n.getAttribute("data-key")];
+    var key=n.getAttribute("data-key"), c=COMPONENTS[key];
     if(!c)return;
-    var show=true;
-    if(c.ossOnly){ show=!anyComm; }
-    else if(c.tier!=="oss"){ show=anyComm; }
+    var show=tierOK(c) && (ADV[key] ? curDetail==="all" : true);
     var wasHidden=(n.style.display==="none");
     n.style.display=show?"":"none";
     if(show&&wasHidden){ n.classList.add("reveal"); (function(el){setTimeout(function(){el.classList.remove("reveal");},1500);})(n); }
   });
-  // OSS observability band + its flow link/packet are OSS-only too
-  var obs=arch.querySelector(".oss-obs-band");
-  if(obs)obs.style.display=anyComm?"none":"";
-  if(LINKS.goldWhisk){LINKS.goldWhisk.style.display=anyComm?"none":"";if(LINKS.goldWhisk._tag)LINKS.goldWhisk._tag.style.display=anyComm?"none":"";}
-  packets.forEach(function(pk){ if(pk.path===LINKS.goldWhisk){ pk._hide=anyComm; if(pk.dot)pk.dot.style.display=anyComm?"none":""; } });
-  var cl=arch.querySelector(".comm-label");
-  if(cl)cl.style.display=anyComm?"":"none";
-  // per-tier links + CTA
+  var obsShown=(curTier==="oss" && curDetail==="all");
+  var obs=arch.querySelector(".oss-obs-band"); if(obs)obs.style.display=obsShown?"":"none";
+  gateLink(LINKS.goldWhisk, obsShown);
+  gateLink(LINKS.confdBird, curDetail==="all");
+  var cl=arch.querySelector(".comm-label"); if(cl)cl.style.display=anyComm?"":"none";
+}
+function applyTier(tier){
+  curTier=tier;
+  Array.prototype.forEach.call(document.querySelectorAll("#tiertoggle button"),function(b){ b.classList.toggle("on",b.getAttribute("data-tier")===tier); });
+  $("tierNote").textContent=TIER_NOTES[tier];
   var tl=$("tierLinks");
   if(tl)tl.innerHTML=(TIER_LINKS[tier]||[]).map(function(l){return '<a class="'+(l.cta?'cta':'')+'" href="'+l.u+'" target="_blank" rel="noopener">'+l.t+'</a>';}).join('');
+  refreshVisibility();
+}
+function applyDetail(mode){
+  curDetail=mode;
+  Array.prototype.forEach.call(document.querySelectorAll("#detailtoggle button"),function(b){ b.classList.toggle("on",b.getAttribute("data-detail")===mode); });
+  refreshVisibility();
 }
 
 /* ---- WALKTHROUGH: two journeys that trace how Calico works ---- */
@@ -560,81 +584,74 @@ function build(){
   head("flowHeadHot","rgba(255,217,172,.9)");
   arch.appendChild(defs);
 
-  // Cluster boundary (taller to fit observability + operator)
-  boundary(arch,20,60,860,640,"bound-cluster","Your Kubernetes cluster","Calico managed by the operator");
+  // ---- Cluster boundary (landscape) ----
+  boundary(arch,110,16,1170,430,"bound-cluster","Your Kubernetes cluster","");
 
-  // tigera-operator strip (top) — the installer/manager of everything
-  var operator=comp(arch,"operator",460,96,220,40);
+  // ---- Control plane lane (cluster-wide) ----
+  boundary(arch,140,66,770,150,"bound-ctl","Control plane (cluster-wide)","");
+  var apiserver=comp(arch,"apiserver",250,146,160,58);
+  var operator=comp(arch,"operator",430,146,160,58);
+  var kubec=comp(arch,"kubecontrollers",620,146,180,58);
+  var typha=comp(arch,"typha",810,146,150,58);
 
-  // Control plane band
-  boundary(arch,44,150,820,140,"bound-ctl","Control plane (cluster-wide)","");
-  var apiserver=comp(arch,"apiserver",165,222,150,46);
-  var kubec=comp(arch,"kubecontrollers",355,222,160,46);
-  var typha=comp(arch,"typha",550,222,140,46);
-  var ds=datastore(arch,760,219,150,52);
+  // ---- Datastore: source-of-truth column on the right ----
+  var ds=datastore(arch,1080,150,232,120);
 
-  // Observability band (OSS since 3.30) — Goldmane + Whisker
-  var obsBand=boundary(arch,44,308,400,120,"bound-ctl","Observability (open source, 3.30+)","");obsBand.classList.add("oss-obs-band");
-  var goldmane=comp(arch,"goldmane",150,372,150,44);
-  var whisker=comp(arch,"whisker",330,372,150,44);
+  // ---- Data plane lane (per node) with stacked-depth cards for "x N" ----
+  arch.appendChild(el("rect",{x:150,y:230,width:760,height:206,rx:14,fill:"rgba(40,46,62,.18)",stroke:"rgba(157,180,224,.16)","stroke-width":1.2,"stroke-dasharray":"6 5"}));
+  arch.appendChild(el("rect",{x:145,y:233,width:760,height:206,rx:14,fill:"rgba(40,46,62,.3)",stroke:"rgba(157,180,224,.26)","stroke-width":1.2,"stroke-dasharray":"6 5"}));
+  boundary(arch,140,236,770,200,"bound-node","Data plane","");
+  var rep=el("g",null,null);
+  rep.appendChild(el("rect",{x:706,y:244,width:190,height:24,rx:12,fill:"rgba(91,141,239,.18)",stroke:"var(--k8s)","stroke-width":1}));
+  var rt=el("text",{x:801,y:260,fill:"#CFE0FF","font-size":"12.5","font-weight":"700","text-anchor":"middle"});rt.textContent="× N nodes · calico/node DaemonSet";rep.appendChild(rt);
+  arch.appendChild(rep);
+  var felix=comp(arch,"felix",235,322,160,58);
+  var cni=comp(arch,"cni",415,322,150,58);
+  var ipam=comp(arch,"ipam",580,322,150,58);
+  var bird=comp(arch,"bird",235,400,150,52);
+  var confd=comp(arch,"confd",410,400,150,52);
+  var csi=comp(arch,"csi",585,400,160,52);
+  var dikastes=comp(arch,"dikastes",775,400,160,52);
 
-  // Commercial band (revealed on Enterprise/Cloud) — to the right of observability
-  var manager=comp(arch,"manager",560,372,150,44);
-  var threat=comp(arch,"threatdefense",740,372,150,44);
-  var commLabel=el("text",{x:560,y:330,fill:"#9CA3AF","font-size":"10","text-anchor":"start"},"comm-label");
+  // Linux kernel (the dataplane Felix programs)
+  var kern=el("g",null,null);
+  var kx=800,ky=322;
+  kern.appendChild(el("rect",{x:kx-82,y:ky-29,width:164,height:58,rx:8,fill:"rgba(40,46,62,.6)",stroke:"rgba(157,180,224,.4)","stroke-width":1.2,"stroke-dasharray":"3 3"}));
+  var kt=el("text",{x:kx,y:ky-3,fill:"#C7D4EC","font-size":"13.5","font-weight":"600","text-anchor":"middle"});kt.textContent="Linux kernel";kern.appendChild(kt);
+  var ks=el("text",{x:kx,y:ky+14,fill:"#9DB8E8","font-size":"10","text-anchor":"middle"});ks.textContent="iptables / eBPF dataplane";kern.appendChild(ks);
+  arch.appendChild(kern);
+  var kernRef={_cx:kx,_cy:ky,_w:164,_h:58};
+
+  // ---- Observability (OSS, advanced) / Commercial (CE+Cloud) share the lower-right slot ----
+  var obsBand=boundary(arch,928,290,340,92,"bound-ctl","Observability (OSS, 3.30+)","");obsBand.classList.add("oss-obs-band");
+  var goldmane=comp(arch,"goldmane",1013,340,150,48);
+  var whisker=comp(arch,"whisker",1183,340,150,48);
+  var manager=comp(arch,"manager",1013,340,150,48);
+  var threat=comp(arch,"threatdefense",1183,340,150,48);
+  var commLabel=el("text",{x:944,y:284,fill:"#9CA3AF","font-size":"11","text-anchor":"start"},"comm-label");
   commLabel.textContent="Commercial add-ons (Enterprise / Cloud)";arch.appendChild(commLabel);
   commLabel.style.display="none";
 
-  // Worker node band (bottom) — with a faint "stacked" shadow to convey "x every node"
-  // back cards (depth)
-  arch.appendChild(el("rect",{x:54,y:440,width:820,height:230,rx:13,fill:"rgba(40,46,62,.18)",stroke:"rgba(157,180,224,.18)","stroke-width":1.2,"stroke-dasharray":"6 5"}));
-  arch.appendChild(el("rect",{x:49,y:444,width:820,height:230,rx:13,fill:"rgba(40,46,62,.3)",stroke:"rgba(157,180,224,.28)","stroke-width":1.2,"stroke-dasharray":"6 5"}));
-  boundary(arch,44,448,820,230,"bound-node","Worker node","");
-  // prominent "x N" repeat badge
-  var rep=el("g",null,null);
-  rep.appendChild(el("rect",{x:790,y:456,width:62,height:22,rx:11,fill:"rgba(91,141,239,.18)",stroke:"var(--k8s)","stroke-width":1}));
-  var rt=el("text",{x:821,y:471,fill:"#CFE0FF","font-size":"12","font-weight":"700","text-anchor":"middle"});rt.textContent="\u00d7 N nodes";rep.appendChild(rt);
-  arch.appendChild(rep);
-  var nsub=el("text",{x:60,y:471,fill:"#B9C7E8","font-size":"10.5","font-weight":"600","text-anchor":"start"});
-  nsub.textContent="runs on every node \u2014 calico/node DaemonSet";arch.appendChild(nsub);
-  var felix=comp(arch,"felix",165,520,150,46);
-  var bird=comp(arch,"bird",345,520,130,46);
-  var confd=comp(arch,"confd",505,520,130,46);
-  var cni=comp(arch,"cni",165,612,140,46);
-  var ipam=comp(arch,"ipam",335,612,130,46);
-  var csi=comp(arch,"csi",505,612,150,46);
-  var dikastes=comp(arch,"dikastes",710,612,150,46);
-
-  // dataplane kernel marker — right of the agent row in node band
-  var kern=el("g",null,null);
-  var kx=720,ky=520;
-  kern.appendChild(el("rect",{x:kx-72,y:ky-23,width:144,height:46,rx:8,fill:"rgba(40,46,62,.6)",stroke:"rgba(157,180,224,.4)","stroke-width":1.2,"stroke-dasharray":"3 3"}));
-  var kt=el("text",{x:kx,y:ky-2,fill:"#C7D4EC","font-size":"12","font-weight":"600","text-anchor":"middle"});kt.textContent="Linux kernel";kern.appendChild(kt);
-  var ks=el("text",{x:kx,y:ky+12,fill:"#9DB8E8","font-size":"8.5","text-anchor":"middle"});ks.textContent="iptables / eBPF dataplane";kern.appendChild(ks);
-  arch.appendChild(kern);
-  var kernRef={_cx:kx,_cy:ky,_w:144,_h:46};
-
-  // "you" actor (kubectl) — left of the control plane, the journey origin
+  // ---- actor (you / kubectl) ----
   var actor=el("g",null,"actor");
-  actor.appendChild(el("circle",{cx:0,cy:0,r:13,fill:"rgba(40,46,62,.9)",stroke:"var(--feature)","stroke-width":1.3,transform:"translate(70,150)"}));
-  var au=el("text",{x:70,y:155,fill:"#C7D4EC","font-size":"13","text-anchor":"middle","font-weight":"700"});au.textContent="\u2328";actor.appendChild(au);
-  var al=el("text",{x:70,y:182,fill:"#9CA3AF","font-size":"9.5","text-anchor":"middle"});al.textContent="you \u00b7 kubectl";actor.appendChild(al);
+  actor.appendChild(el("circle",{cx:0,cy:0,r:16,fill:"rgba(40,46,62,.9)",stroke:"var(--feature)","stroke-width":1.3,transform:"translate(52,118)"}));
+  var au=el("text",{x:52,y:124,fill:"#C7D4EC","font-size":"16","text-anchor":"middle","font-weight":"700"});au.textContent="⌨";actor.appendChild(au);
+  var al=el("text",{x:52,y:152,fill:"#9CA3AF","font-size":"10.5","text-anchor":"middle"});al.textContent="you · kubectl";actor.appendChild(al);
   arch.appendChild(actor);
-  var actorRef={_cx:70,_cy:150,_w:26,_h:26};
+  var actorRef={_cx:52,_cy:118,_w:32,_h:32};
 
-  // ---- control-flow links (the "how they interact" story) ----
-  LINKS.dsTypha   = clink(arch,ds,typha,{from:"left",to:"right",tag:"watch",key:"dsTypha"});
-  LINKS.typhaFelix= clink(arch,typha,felix,{from:"bottom",to:"top",elbow:true,midY:438,tag:"fan-out (filtered)",key:"typhaFelix"});
-  LINKS.apiDs     = clink(arch,apiserver,ds,{from:"top",to:"top",elbow:true,midY:168,key:"apiDs"});
-  LINKS.kubeDs    = clink(arch,kubec,ds,{from:"bottom",to:"bottom",elbow:true,midY:278,key:"kubeDs"});
-  LINKS.felixKern = clink(arch,felix,kernRef,{from:"bottom",to:"bottom",elbow:true,midY:572,tag:"program dataplane",key:"felixKern"});
-  LINKS.confdBird = clink(arch,confd,bird,{from:"left",to:"right",bgp:true,tag:"reload",key:"confdBird"});
-  LINKS.cniIpam   = clink(arch,cni,ipam,{from:"right",to:"left",key:"cniIpam"});
-  LINKS.goldWhisk = clink(arch,goldmane,whisker,{from:"right",to:"left",tag:"flows",key:"goldWhisk"});
-  LINKS.operApi   = clink(arch,operator,apiserver,{from:"bottom",to:"top",elbow:true,midY:140,noPacket:true,key:"operApi"});
-  // journey-only links (no ambient packet; revealed during walkthrough)
+  // ---- control-flow links (keys preserved for the journeys) ----
+  LINKS.operApi   = clink(arch,operator,apiserver,{from:"left",to:"right",noPacket:true,key:"operApi"});
   LINKS.youApi    = clink(arch,actorRef,apiserver,{from:"right",to:"left",noPacket:true,key:"youApi"});
-  LINKS.felixIpam = clink(arch,felix,ipam,{from:"bottom",to:"top",elbow:true,midY:585,noPacket:true,noArrow:true,key:"felixIpam"});
+  LINKS.apiDs     = clink(arch,apiserver,ds,{from:"top",to:"top",elbow:true,midY:52,key:"apiDs"});
+  LINKS.kubeDs    = clink(arch,kubec,ds,{from:"top",to:"top",elbow:true,midY:40,key:"kubeDs"});
+  LINKS.dsTypha   = clink(arch,ds,typha,{from:"left",to:"right",tag:"watch",key:"dsTypha"});
+  LINKS.typhaFelix= clink(arch,typha,felix,{from:"bottom",to:"top",elbow:true,midY:224,tag:"fan-out (filtered)",key:"typhaFelix"});
+  LINKS.felixKern = clink(arch,felix,kernRef,{from:"top",to:"top",elbow:true,midY:282,tag:"program dataplane",key:"felixKern"});
+  LINKS.cniIpam   = clink(arch,cni,ipam,{from:"right",to:"left",key:"cniIpam"});
+  LINKS.confdBird = clink(arch,confd,bird,{from:"left",to:"right",bgp:true,tag:"reload",key:"confdBird"});
+  LINKS.goldWhisk = clink(arch,goldmane,whisker,{from:"right",to:"left",tag:"flows",key:"goldWhisk"});
+  LINKS.felixIpam = clink(arch,felix,ipam,{from:"bottom",to:"top",elbow:true,midY:372,noPacket:true,noArrow:true,key:"felixIpam"});
 
   // store node refs for the walkthrough
   NODES={operator:operator,apiserver:apiserver,kubec:kubec,typha:typha,ds:ds,
@@ -649,6 +666,10 @@ function build(){
 // tier wiring
 Array.prototype.forEach.call(document.querySelectorAll("#tiertoggle button"),function(b){
   b.addEventListener("click",function(){applyTier(b.getAttribute("data-tier"));});
+});
+// detail (Core / + Advanced) wiring
+Array.prototype.forEach.call(document.querySelectorAll("#detailtoggle button"),function(b){
+  b.addEventListener("click",function(){applyDetail(b.getAttribute("data-detail"));});
 });
 // click empty space closes panel
 arch.addEventListener("click",function(e){
