@@ -1,0 +1,225 @@
+<title>Calico Unified Platform</title>
+<style>
+  :root{
+    --ground:#1A1D24;
+    --panel:#21252E;
+    --panel-2:#272C37;
+    --line-soft:#2C313C;
+    --title:#F3F4F6;
+    --text:#C7CDD9;
+    --muted:#9CA3AF;
+    --faint:#6B7280;
+    --accent:#FA8C19;
+    --net:#9AB8FF;
+    --ok:#5BD6A6;
+    --crd:#C7A9DC;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--ground);color:var(--text);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100%;
+    display:flex;flex-direction:column;
+  }
+  #bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+  .veil{position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(115% 80% at 50% -10%,rgba(250,140,25,.10),transparent 55%),
+               radial-gradient(90% 70% at 85% 110%,rgba(154,184,255,.06),transparent 60%)}
+  .wrap{position:relative;z-index:2;flex:1 0 auto;max-width:1080px;width:100%;margin:0 auto;
+    padding:56px 28px 40px;display:flex;flex-direction:column}
+
+  /* ---------- hero ---------- */
+  .hero{text-align:center;margin-bottom:48px}
+  .mark{width:62px;height:70px;margin:0 auto 22px;display:block;
+    filter:drop-shadow(0 0 16px rgba(250,140,25,.45))}
+  .mark svg{display:block;width:100%;height:100%}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--accent);margin:0 0 16px}
+  .hero h1{margin:0;color:var(--title);font-size:clamp(32px,6vw,54px);font-weight:720;letter-spacing:-.02em;line-height:1.04}
+  .pillars{display:inline-flex;flex-wrap:wrap;justify-content:center;gap:10px 18px;margin:20px 0 0;
+    font-size:14px;color:var(--muted);letter-spacing:.04em}
+  .pillars span{display:inline-flex;align-items:center;gap:9px}
+  .pillars span::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  .guide{margin:22px auto 0;max-width:52ch;color:var(--text);font-size:15.5px;line-height:1.6}
+
+  /* ---------- tiles ---------- */
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .tile{position:relative;display:flex;flex-direction:column;text-align:left;
+    background:linear-gradient(180deg,rgba(39,44,55,.72),rgba(33,37,46,.72));
+    border:1px solid var(--line-soft);border-radius:18px;padding:24px 22px 20px;
+    text-decoration:none;color:inherit;overflow:hidden;isolation:isolate;
+    transition:transform .28s cubic-bezier(.4,0,.2,1),border-color .28s,box-shadow .28s,background .28s}
+  .tile::before{content:"";position:absolute;left:0;top:0;height:3px;width:100%;
+    background:var(--edge);opacity:.55;transition:opacity .28s}
+  .tile:hover,.tile:focus-visible{transform:translateY(-6px);border-color:var(--edge);
+    box-shadow:0 18px 40px rgba(8,10,14,.5);background:linear-gradient(180deg,rgba(46,52,66,.92),rgba(36,40,51,.92));outline:none}
+  .tile:hover::before,.tile:focus-visible::before{opacity:1}
+  .tile:focus-visible{box-shadow:0 0 0 2px var(--edge),0 18px 40px rgba(8,10,14,.5)}
+  .t-num{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--faint)}
+  .t-glyph{height:86px;margin:6px 0 16px;display:flex;align-items:center}
+  .t-glyph svg{height:74px;width:auto;overflow:visible}
+  .t-title{color:var(--title);font-size:19px;font-weight:660;letter-spacing:-.01em;margin:0 0 7px}
+  .t-desc{font-size:13.5px;line-height:1.55;color:var(--muted);margin:0 0 18px;flex:1}
+  .t-go{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--edge);font-weight:600}
+  .t-go .arr{transition:transform .28s cubic-bezier(.4,0,.2,1)}
+  .tile:hover .t-go .arr,.tile:focus-visible .t-go .arr{transform:translateX(5px)}
+
+  .tile.arch{--edge:var(--net)}
+  .tile.env{--edge:var(--ok)}
+  .tile.uni{--edge:var(--accent)}
+
+  footer{position:relative;z-index:2;flex-shrink:0;padding:18px 28px 26px;text-align:center}
+  footer .f-row{display:inline-flex;flex-wrap:wrap;justify-content:center;gap:8px 18px;font-size:12px;color:var(--faint)}
+  footer a{color:var(--muted);text-decoration:none;border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+  footer a:hover{color:var(--net);border-color:var(--net)}
+  footer .dot{color:var(--line-soft)}
+
+  @media (max-width:760px){
+    .tiles{grid-template-columns:1fr}
+    .wrap{padding-top:40px}
+    .t-glyph{height:70px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .tile,.t-go .arr{transition:none}
+  }
+</style>
+
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="mark" aria-hidden="true">
+      <svg viewBox="0 0 62 70"><path d="M31 3 58 13 58 37 Q58 58 31 67 Q4 58 4 37 L4 13 Z"
+        fill="rgba(250,140,25,.16)" stroke="#FA8C19" stroke-width="2.2" stroke-linejoin="round"/>
+        <circle cx="31" cy="31" r="5.4" fill="#FA8C19"/>
+        <path d="M31 31 L17 19 M31 31 L45 19 M31 31 L31 50" stroke="#9AB8FF" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="17" cy="19" r="3" fill="#9AB8FF"/><circle cx="45" cy="19" r="3" fill="#9AB8FF"/><circle cx="31" cy="50" r="3" fill="#9AB8FF"/></svg>
+    </span>
+    <p class="eyebrow">Interactive reference</p>
+    <h1>Calico Unified Platform</h1>
+    <div class="pillars"><span>Networking</span><span>Security</span><span>Observability</span></div>
+    <p class="guide">Three ways to explore Calico. Pick where you want to start.</p>
+  </header>
+
+  <nav class="tiles" aria-label="Choose an experience">
+
+    <a class="tile arch" href="https://tigera-cs.github.io/RefArch-Temp/Calico_Architecture_v1.html">
+      <span class="t-num">01</span>
+      <span class="t-glyph" aria-hidden="true">
+        <svg viewBox="0 0 90 74">
+          <line x1="20" y1="20" x2="45" y2="40" stroke="#3A4A8C" stroke-width="1.6"/>
+          <line x1="70" y1="18" x2="45" y2="40" stroke="#3A4A8C" stroke-width="1.6"/>
+          <line x1="45" y1="40" x2="30" y2="62" stroke="#3A4A8C" stroke-width="1.6"/>
+          <line x1="45" y1="40" x2="72" y2="58" stroke="#3A4A8C" stroke-width="1.6"/>
+          <circle cx="45" cy="40" r="8" fill="rgba(154,184,255,.18)" stroke="#9AB8FF" stroke-width="1.8"/>
+          <circle cx="20" cy="20" r="5" fill="#21252E" stroke="#9AB8FF" stroke-width="1.6"/>
+          <circle cx="70" cy="18" r="5" fill="#21252E" stroke="#9AB8FF" stroke-width="1.6"/>
+          <circle cx="30" cy="62" r="5" fill="#21252E" stroke="#9AB8FF" stroke-width="1.6"/>
+          <circle cx="72" cy="58" r="5" fill="#21252E" stroke="#9AB8FF" stroke-width="1.6"/>
+          <circle cx="33" cy="30" r="2.2" fill="#9AB8FF"/>
+        </svg>
+      </span>
+      <h2 class="t-title">Architecture</h2>
+      <p class="t-desc">How Calico sits in your cluster. Click any component to learn what it does, then watch a policy and a pod come to life.</p>
+      <span class="t-go">Explore <span class="arr">&rarr;</span></span>
+    </a>
+
+    <a class="tile env" href="https://tigera-cs.github.io/RefArch-Temp/Calico_Envision_v1.html">
+      <span class="t-num">02</span>
+      <span class="t-glyph" aria-hidden="true">
+        <svg viewBox="0 0 90 74">
+          <rect x="14" y="16" width="26" height="6" rx="3" fill="#2C313C"/>
+          <rect x="14" y="30" width="20" height="6" rx="3" fill="#2C313C"/>
+          <rect x="14" y="44" width="24" height="6" rx="3" fill="rgba(91,214,166,.3)"/>
+          <path d="M44 35 L58 35 M52 29 L58 35 L52 41" fill="none" stroke="#5BD6A6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <polygon points="72,22 80,27 80,37 72,42 64,37 64,27" fill="rgba(91,214,166,.16)" stroke="#5BD6A6" stroke-width="1.6"/>
+          <polygon points="72,40 79,44 79,52 72,56 65,52 65,44" fill="rgba(91,214,166,.10)" stroke="#5BD6A6" stroke-width="1.4" opacity=".8"/>
+        </svg>
+      </span>
+      <h2 class="t-title">Envision</h2>
+      <p class="t-desc">Answer a few questions about your environment and the page assembles a reference architecture tailored to your world.</p>
+      <span class="t-go">Build yours <span class="arr">&rarr;</span></span>
+    </a>
+
+    <a class="tile uni" href="https://tigera-cs.github.io/RefArch-Temp/Calico_Unified%20Platform_v1.html">
+      <span class="t-num">03</span>
+      <span class="t-glyph" aria-hidden="true">
+        <svg viewBox="0 0 90 74">
+          <polygon points="45,10 74,24 45,38 16,24" fill="rgba(250,140,25,.22)" stroke="#FA8C19" stroke-width="1.8" stroke-linejoin="round"/>
+          <polygon points="45,28 74,42 45,56 16,42" fill="rgba(250,140,25,.14)" stroke="#FA8C19" stroke-width="1.6" stroke-linejoin="round"/>
+          <polygon points="45,44 74,58 45,72 16,58" fill="rgba(250,140,25,.08)" stroke="#FA8C19" stroke-width="1.4" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <h2 class="t-title">Unified Platform</h2>
+      <p class="t-desc">The full platform tour. Drill from networking, security and observability into live, animated capability demos.</p>
+      <span class="t-go">Take the tour <span class="arr">&rarr;</span></span>
+    </a>
+
+  </nav>
+</div>
+
+<footer>
+  <div class="f-row">
+    <span>Calico by Tigera</span>
+    <span class="dot">&middot;</span>
+    <a href="https://docs.tigera.io/calico/latest/about/calico-product-editions" target="_blank" rel="noopener">Compare editions</a>
+    <span class="dot">&middot;</span>
+    <a href="https://www.tigera.io/" target="_blank" rel="noopener">tigera.io</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var c=document.getElementById('bg');if(!c)return;
+  var ctx=c.getContext('2d');
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var dpr=Math.max(1,Math.min(2,window.devicePixelRatio||1));
+  var W,H,nodes,edges,packets,raf;
+  function rand(a,b){return a+(b-a)*((Math.sin(seed++)*43758.5453)%1+1)%1;}
+  var seed=7.13;
+  function size(){
+    W=window.innerWidth;H=window.innerHeight;
+    c.width=Math.round(W*dpr);c.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+    build();
+  }
+  function build(){
+    var n=Math.max(10,Math.min(20,Math.round(W*H/90000)));
+    nodes=[];
+    for(var i=0;i<n;i++){nodes.push({x:rand(0,1)*W,y:rand(0,1)*H,r:rand(1.2,2.6)});}
+    edges=[];
+    for(var i=0;i<nodes.length;i++){
+      // connect each node to its nearest couple of neighbours
+      var d=[];for(var j=0;j<nodes.length;j++){if(i!==j){var dx=nodes[i].x-nodes[j].x,dy=nodes[i].y-nodes[j].y;d.push([dx*dx+dy*dy,j]);}}
+      d.sort(function(a,b){return a[0]-b[0];});
+      for(var k=0;k<2&&k<d.length;k++){var pair=[i,d[k][1]].sort();if(!edges.some(function(e){return e[0]===pair[0]&&e[1]===pair[1];}))edges.push(pair);}
+    }
+    packets=edges.map(function(e,i){return {e:i,t:(i*0.17)%1,sp:0.0009+ (i%4)*0.00035};});
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    edges.forEach(function(e){
+      var a=nodes[e[0]],b=nodes[e[1]];
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+      ctx.strokeStyle='rgba(58,74,140,0.22)';ctx.lineWidth=1;ctx.stroke();
+    });
+    packets.forEach(function(p){
+      var e=edges[p.e],a=nodes[e[0]],b=nodes[e[1]];
+      var x=a.x+(b.x-a.x)*p.t,y=a.y+(b.y-a.y)*p.t;
+      ctx.beginPath();ctx.arc(x,y,1.7,0,6.2832);
+      ctx.fillStyle='rgba(154,184,255,0.55)';ctx.shadowColor='rgba(154,184,255,0.7)';ctx.shadowBlur=5;ctx.fill();ctx.shadowBlur=0;
+    });
+    nodes.forEach(function(n){
+      ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,6.2832);
+      ctx.fillStyle='rgba(157,184,224,0.35)';ctx.fill();
+    });
+  }
+  function tick(){packets.forEach(function(p){p.t+=p.sp;if(p.t>1)p.t-=1;});draw();raf=requestAnimationFrame(tick);}
+  size();
+  if(reduce){draw();}else{tick();}
+  var to;window.addEventListener('resize',function(){clearTimeout(to);to=setTimeout(function(){if(raf)cancelAnimationFrame(raf);seed=7.13;size();if(reduce){draw();}else{tick();}},160);});
+})();
+</script>
