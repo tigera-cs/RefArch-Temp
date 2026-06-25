@@ -784,9 +784,10 @@ function buildDiagram(){
       ns.querySelector(".ns-rect").classList.add("policed");
     });
   }
-  /* ---- encryption: lock glyph on the cross-cluster top-gutter rail ---- */
+  /* ---- encryption: lock glyph on the cross-cluster link's vertical drop into cluster B
+     (clear of the Calico-overlay datastore/Typha badges that occupy the top-gutter rail) ---- */
   if(has("encryption")){
-    var lk=el("text",{x:400,y:110},"flow-tag");
+    var lk=el("text",{x:650,y:172},"flow-tag");
     lk.setAttribute("text-anchor","middle");lk.textContent="\uD83D\uDD12 WireGuard";scene.appendChild(lk);anim.push(lk);
   }
 
@@ -885,12 +886,14 @@ function buildCalicoLayer(scene,has,conn,R){
   calArrow(cal,286,108,311,108); // datastore -> typha (right)
 
   // --- Felix (dataplane) badge per cluster, in CLEAR interior space ---
-  // Cluster A: lower-right interior, below ns:web (ns:web bottom y326; cluster A bottom y490)
-  var felixA=calBadge(cal,376,405,150,26,"Felix + eBPF","Cluster A dataplane");
-  // Cluster B: title row, right side (title is left-aligned at x575)
-  var felixB=calBadge(cal,808,232,150,26,"Felix + eBPF","Cluster B dataplane");
-  // Typha -> Felix A: down into cluster A interior
-  calArrow(cal,360,121,felixA._cx,felixA._cy-13,[[360,405]]);
+  // Cluster A: the clear gap between ns:grid-apps (right edge x264) and the EGW hex (left edge x410)
+  // is only ~146px, so the badge is 120 wide and centered in it, below ns:web (bottom y326).
+  var felixA=calBadge(cal,336,400,120,26,"Felix + eBPF","Cluster A dataplane");
+  // Cluster B: lifted into the clear band ABOVE the cluster top border (y224) so it never
+  // straddles the border or crowds the (sometimes long) cluster title.
+  var felixB=calBadge(cal,808,200,120,26,"Felix + eBPF","Cluster B dataplane");
+  // Typha -> Felix A: down the control column, then in along Felix A's top edge
+  calArrow(cal,360,121,felixA._cx,felixA._cy-13,[[360,387]]);
   // Typha -> Felix B: right across top gutter, down into felixB
   calArrow(cal,408,108,felixB._cx,felixB._cy-13,[[808,108]]);
 
