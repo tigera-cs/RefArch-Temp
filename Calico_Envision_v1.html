@@ -121,6 +121,48 @@
   .chip.edge{border-color:rgba(224,180,69,.4);color:var(--warn)}
   .sharebtn{margin-top:12px;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid rgba(154,184,255,.32);background:rgba(40,46,62,.55);color:#9AB8FF;font-size:11.5px;font-weight:600;cursor:pointer;transition:background .2s,border-color .2s,color .2s}
   .sharebtn:hover{background:rgba(48,56,78,.85);border-color:rgba(154,184,255,.6);color:#C2D5FF}
+  .pdfbtn{margin-top:8px;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid rgba(250,140,25,.42);background:rgba(250,140,25,.1);color:#FFD9AC;font-size:11.5px;font-weight:600;cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+  .pdfbtn:hover{background:rgba(250,140,25,.2);border-color:var(--amber);color:#FFE9D2}
+
+  /* DIY "build your own" tile (full-width, distinct path) */
+  .opt.diy{flex:1 1 100%;max-width:none;border-style:dashed;border-color:rgba(250,140,25,.45);background:rgba(250,140,25,.05);text-align:center}
+  .opt.diy:hover{border-color:var(--amber);background:rgba(250,140,25,.1)}
+  .opt.diy.sel{border-style:solid}
+  .diy-badge{display:inline-block;margin-right:9px;padding:2px 8px;border-radius:6px;background:var(--amber);color:#1A1D24;font-size:9.5px;font-weight:800;letter-spacing:.12em;vertical-align:middle}
+
+  /* email capture (soft gate) modal */
+  .lead-ov{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(10,12,16,.72);backdrop-filter:blur(3px)}
+  .lead-ov.on{display:flex}
+  .lead-card{width:min(430px,90vw);background:var(--panel-2);border:1px solid rgba(154,184,255,.22);border-radius:16px;padding:30px 30px 26px;box-shadow:0 24px 70px rgba(0,0,0,.55)}
+  .lead-card h3{margin:0 0 6px;font-size:18px;color:var(--title);font-weight:700}
+  .lead-card p{margin:0 0 18px;font-size:13px;line-height:1.5;color:var(--subtitle)}
+  .lead-card input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(140,150,170,.32);background:var(--bg);color:var(--label);font-size:14px;outline:none;transition:border-color .2s}
+  .lead-card input:focus{border-color:var(--amber)}
+  .lead-err{color:#E0857A;font-size:11.5px;min-height:14px;margin:6px 2px 0}
+  .lead-go{margin-top:14px;width:100%;padding:12px;border:none;border-radius:10px;background:var(--amber);color:#1A1D24;font-size:14px;font-weight:700;cursor:pointer;transition:filter .2s}
+  .lead-go:hover{filter:brightness(1.08)}
+  .lead-skip{display:block;margin:14px auto 0;background:none;border:none;color:var(--feature);font-size:11.5px;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+  .lead-skip:hover{color:var(--label)}
+  .lead-x{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--feature);font-size:22px;line-height:1;cursor:pointer}
+
+  /* print / save-as-PDF: strip the chrome, keep the diagram + summary + caption, preserve the dark theme */
+  @media print{
+    @page{margin:12mm}
+    html,body{height:auto;overflow:visible;background:#1A1D24;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .backbtn,.shieldWrap,.toggle-wrap,.restart,.sharebtn,.pdfbtn,.lead-ov,#prompt,#wizard,.topbar p,.crumb,.packet,.fdot{display:none !important}
+    /* fully neutralize the absolutely-positioned canvas so it linearizes top-to-bottom */
+    #app,#app.build,.scene,.stage,.summary,.diagram-wrap,.caption,.topbar{
+      position:static !important;inset:auto !important;left:auto !important;top:auto !important;
+      right:auto !important;bottom:auto !important;transform:none !important;z-index:auto !important}
+    .scene{height:auto !important}
+    .stage{display:block !important;padding:0 !important}
+    .topbar{text-align:center;margin-bottom:8px}
+    .topbar h1{font-size:20px}
+    .summary{max-width:none !important;margin:0 0 12px !important;text-align:center}
+    .diagram-wrap{width:100% !important;max-width:900px;margin:0 auto !important}
+    .diagram-svg{width:100% !important;height:auto !important}
+    .caption{max-width:680px !important;margin:14px auto 0 !important;text-align:center}
+  }
 
   /* flow-trace legend (top-right) */
   .toggle-wrap{position:absolute;top:96px;right:40px;z-index:30;text-align:right}
@@ -290,6 +332,18 @@
     </div>
   </div>
 </div>
+<!-- EMAIL CAPTURE (soft gate on Save-as-PDF) -->
+<div class="lead-ov" id="leadOv">
+  <div class="lead-card" style="position:relative">
+    <button class="lead-x" id="leadX" aria-label="Close">&times;</button>
+    <h3>Want a copy of this architecture?</h3>
+    <p>Drop your email and we'll save you the PDF and a solutions architect can walk you through it whenever you're ready.</p>
+    <input type="email" id="leadEmail" placeholder="you@company.com" autocomplete="email" />
+    <div class="lead-err" id="leadErr"></div>
+    <button class="lead-go" id="leadGo">Save my PDF &rarr;</button>
+    <button class="lead-skip" id="leadSkip">No thanks, just save the PDF</button>
+  </div>
+</div>
 <script>
 (function(){
 'use strict';
@@ -304,7 +358,8 @@ var INDUSTRIES=[
   {id:"fnb",name:"Food & Beverage",sub:"Retail, POS, e-commerce"},
   {id:"govt",name:"Government",sub:"Public sector, defense"},
   {id:"utilities",name:"Utilities",sub:"Energy, grid, OT"},
-  {id:"other",name:"SaaS / Other",sub:"Multi-tenant platforms"}
+  {id:"other",name:"SaaS / Other",sub:"Multi-tenant platforms"},
+  {id:"diy",name:"Not sure yet? Build your own stack",sub:"Skip the industry, pick the capabilities and we assemble a generic reference",diy:true}
 ];
 
 /* Per-industry profiles: cluster + namespace + workload labels, sensible defaults, and the
@@ -345,7 +400,13 @@ var INDUSTRY_PROFILES={
     pods:["tenant-a-api","tenant-a-db","gateway","tenant-b-api","cache"],
     defaults:["microseg","ingress","observability","egress"],conn:"connected",
     title:"A multi-tenant SaaS reference topology",
-    driver:"Built to isolate every tenant with identity-based policy and prove the separation."}
+    driver:"Built to isolate every tenant with identity-based policy and prove the separation."},
+  diy:{clusterA:"Your Cluster",clusterB:"Second Cluster",
+    ns:["ns: frontend","ns: backend","ns: data","ns: platform"],
+    pods:["web","api","worker","database","cache"],
+    defaults:["microseg","observability"],conn:"connected",
+    title:"Your custom reference topology",
+    driver:"Assembled from the capabilities you picked, a clean starting point you can shape to your environment."}
 };
 
 /* Use cases reverse-engineered from what a Finance shop needs.
@@ -375,8 +436,8 @@ var app=$("app");
 function renderIndustry(){
   var box=$("industryOpts");box.innerHTML="";
   INDUSTRIES.forEach(function(o){
-    var d=document.createElement("div");d.className="opt";
-    d.innerHTML=o.name+'<span class="od">'+o.sub+'</span>';
+    var d=document.createElement("div");d.className="opt"+(o.diy?" diy":"");
+    d.innerHTML=(o.diy?'<span class="diy-badge">DIY</span>':'')+o.name+'<span class="od">'+o.sub+'</span>';
     if(state.industry===o.id)d.classList.add("sel");
     d.onclick=function(){
       Array.prototype.forEach.call(box.children,function(c){c.classList.remove("sel");});
@@ -442,7 +503,7 @@ function setCrumb(){
   }
   $("crumb").textContent=parts.join("  \u203A  ");
 }
-function industryName(id){for(var i=0;i<INDUSTRIES.length;i++)if(INDUSTRIES[i].id===id)return INDUSTRIES[i].name;return "";}
+function industryName(id){if(id==="diy")return "Custom stack";for(var i=0;i<INDUSTRIES.length;i++)if(INDUSTRIES[i].id===id)return INDUSTRIES[i].name;return "";}
 
 /* ---------------- NAV WIRING ---------------- */
 $("startBtn").onclick=function(){
@@ -756,8 +817,10 @@ function buildDiagram(){
   var cn=CONNECTIVITY.filter(function(c){return c.id===conn;})[0];
   if(cn)html+='<span class="chip edge">'+cn.label+'</span>';
   html+='<button class="sharebtn" id="shareBtn">\u29C9 Copy share link</button>';
+  html+='<button class="pdfbtn" id="pdfBtn">\u2913 Save as PDF</button>';
   sum.innerHTML=html;
   var sb=$("shareBtn"); if(sb)sb.onclick=shareLink;
+  var pb=$("pdfBtn"); if(pb)pb.onclick=function(){ requestPDF(); };
 
   /* ---- flow spotlight legend (replaces the old K8s/Calico toggle) ---- */
   buildFlowLegend(has,conn);
@@ -914,6 +977,59 @@ function wireViewToggle(){
   tl.onclick=function(){$("stage").setAttribute("data-view","logical");tl.classList.add("on");tc.classList.remove("on");};
   tc.onclick=function(){$("stage").setAttribute("data-view","calico");tc.classList.add("on");tl.classList.remove("on");};
 }
+/* ---------------- SAVE AS PDF + EMAIL SOFT-GATE ----------------
+   Share link is free (above). Save-as-PDF asks for an email first, but a prospect
+   can still skip, so we never block the takeaway. Leads are stored client-side for
+   now; to turn on real delivery, fill ENDPOINT below (Formspree / Google Form) and
+   uncomment the fetch. Everything else already works. */
+var LEAD_ENDPOINT=""; // e.g. "https://formspree.io/f/xxxxxxx" (empty = stub, store locally)
+function submitLead(email){
+  var payload={
+    email:email||"",
+    industry:state.industry,
+    usecases:(state.usecases||[]).slice(),
+    connectivity:state.connectivity,
+    page:"envision",
+    ts:new Date().toISOString()
+  };
+  try{
+    var key="envision_leads";
+    var arr=JSON.parse(localStorage.getItem(key)||"[]");
+    arr.push(payload);
+    localStorage.setItem(key,JSON.stringify(arr));
+  }catch(e){}
+  if(LEAD_ENDPOINT){
+    try{
+      fetch(LEAD_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify(payload)});
+    }catch(e){}
+  }
+}
+function doPrint(){ try{window.print();}catch(e){} }
+function closeLead(){ var ov=$("leadOv"); if(ov)ov.classList.remove("on"); }
+function requestPDF(){
+  var ov=$("leadOv"); if(!ov){ doPrint(); return; }
+  var err=$("leadErr"); if(err)err.textContent="";
+  var inp=$("leadEmail"); if(inp)inp.value="";
+  ov.classList.add("on");
+  if(inp)setTimeout(function(){inp.focus();},60);
+}
+(function wireLead(){
+  var go=$("leadGo"),skip=$("leadSkip"),x=$("leadX"),ov=$("leadOv"),inp=$("leadEmail"),err=$("leadErr");
+  if(!go)return;
+  function valid(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+  function submitAndPrint(){
+    var v=(inp&&inp.value||"").trim();
+    if(!valid(v)){ if(err)err.textContent="Please enter a valid email, or use the skip link below."; if(inp)inp.focus(); return; }
+    submitLead(v); closeLead(); setTimeout(doPrint,180);
+  }
+  go.onclick=submitAndPrint;
+  if(inp)inp.onkeydown=function(e){ if(e.key==="Enter"||e.keyCode===13)submitAndPrint(); };
+  if(skip)skip.onclick=function(){ submitLead(""); closeLead(); setTimeout(doPrint,180); };
+  if(x)x.onclick=closeLead;
+  if(ov)ov.onclick=function(e){ if(e.target===ov)closeLead(); };
+})();
+document.addEventListener("keydown",function(e){ if((e.key==="Escape"||e.keyCode===27)){ var ov=$("leadOv"); if(ov&&ov.classList.contains("on"))closeLead(); } });
+
 wireViewToggle();
 applyHash();
 })();
