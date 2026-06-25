@@ -42,7 +42,9 @@
   .comp.reveal .cbox{animation:revealGlow 1.5s ease-out}
 
   .stage{position:absolute;inset:0;z-index:10}
-  .diagram-wrap{position:absolute;left:24px;right:24px;top:166px;bottom:172px}
+  .diagram-wrap{position:absolute;left:24px;right:24px;top:206px;bottom:172px;transition:right .35s cubic-bezier(.4,0,.2,1),left .35s cubic-bezier(.4,0,.2,1)}
+  /* when the detail panel is open, give it room so it never covers the diagram */
+  .stage.panel-open .diagram-wrap{right:372px}
   svg.arch{width:100%;height:100%;display:block;overflow:visible}
 
   /* nodes */
@@ -87,6 +89,11 @@
     padding:22px;overflow-y:auto;box-shadow:-14px 0 40px rgba(10,12,16,.55);
     transition:transform .35s cubic-bezier(.5,0,.2,1),opacity .3s}
   .panel.hidden{transform:translateX(20px);opacity:0;pointer-events:none}
+  .panel .p-close{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:8px;
+    border:1px solid rgba(140,150,170,.25);background:rgba(40,46,62,.6);color:var(--subtitle);
+    font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:background .2s,color .2s,border-color .2s}
+  .panel .p-close:hover{background:rgba(60,68,88,.95);color:var(--label);border-color:rgba(154,184,255,.55)}
   .panel .p-eyebrow{color:var(--amber);font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
   .panel h2{margin:8px 0 4px;color:var(--title);font-size:19px;font-weight:600}
   .panel .p-where{display:inline-block;font-size:10.5px;color:var(--feature);background:var(--panel-2);
@@ -396,8 +403,9 @@ function clearSel(){
 function selectComp(key,grp){
   clearSel();grp.classList.add("sel");selKey=key;
   var c=COMPONENTS[key];
-  var p=$("panel");p.classList.remove("hidden");
-  p.innerHTML='<div class="p-eyebrow">Component</div>'+
+  openPanel();
+  $("panel").innerHTML='<button class="p-close" aria-label="Close panel">\u00d7</button>'+
+    '<div class="p-eyebrow">Component</div>'+
     '<h2>'+c.name+'</h2>'+
     '<span class="p-where">'+c.where+'</span>'+
     '<p class="p-role">'+c.role+'</p>'+
@@ -405,8 +413,9 @@ function selectComp(key,grp){
 }
 function selectDatastore(grp){
   clearSel();grp.classList.add("sel");selKey="__datastore__";
-  var p=$("panel");p.classList.remove("hidden");
-  var html='<div class="p-eyebrow">Datastore</div>'+
+  openPanel();
+  var html='<button class="p-close" aria-label="Close panel">×</button>'+
+    '<div class="p-eyebrow">Datastore</div>'+
     '<h2>Where your CRDs live</h2>'+
     '<span class="p-where">Kubernetes API datastore (kdd)</span>'+
     '<p>By default Calico stores all its state as <b>Custom Resource Definitions</b> in your cluster\u2019s own Kubernetes API \u2014 so they get native RBAC and audit logging, with no extra database to run. (etcd is supported for non-Kubernetes hosts.)</p>';
@@ -417,8 +426,10 @@ function selectDatastore(grp){
   });
   html+='<p class="crd-note">You manage these with <b>kubectl</b> (via the Calico API server) or <b>calicoctl</b>. Felix reads them \u2014 through Typha \u2014 and programs the dataplane.</p>'+
     '<a class="p-link" href="https://docs.tigera.io/calico/latest/reference/resources" target="_blank" rel="noopener">Full resource reference \u2197</a>';
-  p.innerHTML=html;
+  $("panel").innerHTML=html;
 }
+function openPanel(){ $("panel").classList.remove("hidden"); var st=document.querySelector(".stage"); if(st)st.classList.add("panel-open"); }
+function closePanel(){ clearSel(); $("panel").classList.add("hidden"); selKey=null; var st=document.querySelector(".stage"); if(st)st.classList.remove("panel-open"); }
 
 /* ---- tier + detail selectors (combined visibility engine) ---- */
 var ADV={bird:1,confd:1,csi:1,dikastes:1,goldmane:1,whisker:1}; // live behind the "+ Advanced" toggle
@@ -602,8 +613,8 @@ function build(){
   arch.appendChild(el("rect",{x:145,y:233,width:760,height:206,rx:14,fill:"rgba(40,46,62,.3)",stroke:"rgba(157,180,224,.26)","stroke-width":1.2,"stroke-dasharray":"6 5"}));
   boundary(arch,140,236,770,200,"bound-node","Data plane","");
   var rep=el("g",null,null);
-  rep.appendChild(el("rect",{x:706,y:244,width:190,height:24,rx:12,fill:"rgba(91,141,239,.18)",stroke:"var(--k8s)","stroke-width":1}));
-  var rt=el("text",{x:801,y:260,fill:"#CFE0FF","font-size":"12.5","font-weight":"700","text-anchor":"middle"});rt.textContent="× N nodes · calico/node DaemonSet";rep.appendChild(rt);
+  rep.appendChild(el("rect",{x:786,y:244,width:110,height:24,rx:12,fill:"rgba(91,141,239,.18)",stroke:"var(--k8s)","stroke-width":1}));
+  var rt=el("text",{x:841,y:260,fill:"#CFE0FF","font-size":"12.5","font-weight":"700","text-anchor":"middle"});rt.textContent="× N nodes";rep.appendChild(rt);
   arch.appendChild(rep);
   var felix=comp(arch,"felix",235,322,160,58);
   var cni=comp(arch,"cni",415,322,150,58);
@@ -673,8 +684,11 @@ Array.prototype.forEach.call(document.querySelectorAll("#detailtoggle button"),f
 });
 // click empty space closes panel
 arch.addEventListener("click",function(e){
-  if(e.target===arch){clearSel();$("panel").classList.add("hidden");selKey=null;}
+  if(e.target===arch){closePanel();}
 });
+// explicit close button (delegated) + Escape key
+$("panel").addEventListener("click",function(e){ if(e.target.closest(".p-close"))closePanel(); });
+document.addEventListener("keydown",function(e){ if(e.key==="Escape")closePanel(); });
 
 build();
 })();
