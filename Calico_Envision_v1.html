@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Calico Unified Platform — Envision Your Infrastructure</title>
+<title>Envision Your Infrastructure | Calico</title>
 <style>
   :root{
     --bg:#1A1D24;
@@ -221,7 +221,7 @@
 <body>
 <div id="app" class="landing">
   <div class="topbar">
-    <h1>Calico Unified Platform</h1>
+    <h1>Envision Your Infrastructure</h1>
     <p>Networking&nbsp;&nbsp;|&nbsp;&nbsp;Security&nbsp;&nbsp;|&nbsp;&nbsp;Observability&nbsp;&nbsp;|&nbsp;&nbsp;VM&nbsp;Migration</p>
     <div class="crumb" id="crumb"></div>
   </div>
@@ -249,7 +249,7 @@
       <div class="step" data-step="1">
         <div class="q-eyebrow">Step 2 of 3</div>
         <div class="q-title">What matters most to you?</div>
-        <div class="q-sub">Select all that apply &mdash; each one adds the matching Calico capability to your diagram.</div>
+        <div class="q-sub">Select all that apply, each one adds the matching Calico capability to your diagram.</div>
         <div class="opts" id="usecaseOpts"></div>
       </div>
       <!-- step 3: connectivity -->
@@ -282,7 +282,7 @@
       <div class="caption" id="caption">
         <h3 id="capTitle"></h3>
         <p id="capBody"></p>
-        <span class="vet">Placeholder copy &mdash; pending marketing review</span>
+        <span class="vet">Placeholder copy, pending marketing review</span>
       </div>
       <button class="restart" id="restartBtn">&#8635; Start over</button>
     </div>
@@ -429,6 +429,8 @@ var packets=[];         // active packet animation objects
 var rafId=null;
 var flowPaths={};       // id -> {el, len, kind}
 var spotlight=null;     // currently spotlighted flow kind, or null = ambient
+// z-layers so packets ride on the links but pass BEHIND node labels: bg < links < packets < nodes
+var L_bg=null,L_link=null,L_pkt=null,L_node=null;
 
 function clearDiagram(){
   if(rafId){cancelAnimationFrame(rafId);rafId=null;}
@@ -449,7 +451,7 @@ function hexNode(g,cx,cy,r,label,kind){
   var grp=el("g",null,"node "+(kind||"app"));
   grp.appendChild(el("polygon",{points:hexPoints(cx,cy,r)},"hex"));
   var t=el("text",{x:cx,y:cy+3.5},"hex-label");t.textContent=label;grp.appendChild(t);
-  g.appendChild(grp);
+  (L_node||g).appendChild(grp);
   grp._cx=cx;grp._cy=cy;grp._r=r;
   anim.push(grp);
   return grp;
@@ -459,7 +461,7 @@ function boxNode(g,cx,cy,w,h,label,kind){
   var grp=el("g",null,"boxnode "+(kind||""));
   grp.appendChild(el("rect",{x:cx-w/2,y:cy-h/2,width:w,height:h,rx:9},"box"));
   var t=el("text",{x:cx,y:cy+4},"box-label");t.textContent=label;grp.appendChild(t);
-  g.appendChild(grp);
+  (L_node||g).appendChild(grp);
   grp._cx=cx;grp._cy=cy;
   anim.push(grp);
   return grp;
@@ -469,7 +471,7 @@ function clusterBox(g,x,y,w,h,title){
   var grp=el("g",null,"cluster");
   grp.appendChild(el("rect",{x:x,y:y,width:w,height:h,rx:14},"cluster-rect"));
   var t=el("text",{x:x+16,y:y+22},"cluster-title");t.textContent=title;grp.appendChild(t);
-  g.insertBefore(grp,g.firstChild); // behind everything
+  var bg=(L_bg||g); bg.insertBefore(grp,bg.firstChild); // behind everything
   anim.push(grp);
   return grp;
 }
@@ -478,7 +480,7 @@ function nsBox(g,x,y,w,h,title){
   var grp=el("g",null,"ns");
   grp.appendChild(el("rect",{x:x,y:y,width:w,height:h,rx:10},"ns-rect"));
   var t=el("text",{x:x+12,y:y+17},"ns-title");t.textContent=title;grp.appendChild(t);
-  g.appendChild(grp);
+  (L_bg||g).appendChild(grp);
   anim.push(grp);
   return grp;
 }
@@ -521,13 +523,13 @@ function link(g,a,b,kind,ortho,mode){
   } else if(Math.abs(x1-x2)<2 || Math.abs(y1-y2)<2){
     pts=[[x1,y1],[x2,y2]];                // straight
   } else {
-    // default: midpoint Z-route (H, V, H) — keeps lines clear of node centers
+    // default: midpoint Z-route (H, V, H), keeps lines clear of node centers
     var mx=(x1+x2)/2;
     pts=[[x1,y1],[mx,y1],[mx,y2],[x2,y2]];
   }
   var d=roundedOrtho(pts,8);
   var p=el("path",{d:d},"link "+(kind||""));
-  g.appendChild(p);
+  (L_link||g).appendChild(p);
   p._len=p.getTotalLength();
   p._kind=kind;
   anim.push(p);
@@ -544,7 +546,7 @@ function spawnPacket(path,kind,speed,delay){
 function ensureDot(pk){
   if(pk.dot)return pk.dot;
   var c=el("circle",{r:3.4},"packet "+pk.kind);
-  diagram.appendChild(c);pk.dot=c;return c;
+  (L_pkt||diagram).appendChild(c);pk.dot=c;return c;
 }
 var lastTs=0;
 function tick(ts){
@@ -592,6 +594,9 @@ function buildDiagram(){
 
   var scene=el("g",null,"scene-g");
   diagram.appendChild(scene);
+  // ordered z-layers (helpers route into these by type)
+  L_bg=el("g",null,"l-bg"); L_link=el("g",null,"l-link"); L_pkt=el("g",null,"l-pkt"); L_node=el("g",null,"l-node");
+  scene.appendChild(L_bg); scene.appendChild(L_link); scene.appendChild(L_pkt); scene.appendChild(L_node);
 
   /* ---- CLUSTER A (left, primary) : 2 namespaces ---- */
   var cA=clusterBox(scene,60,150,430,340,"Production Cluster");
@@ -602,7 +607,7 @@ function buildDiagram(){
   // namespace: web
   var nsWeb=nsBox(scene,286,196,180,130,"ns: web");
   var podWeb1=hexNode(scene,376,262,26,"web","app");
-  // EGW hexagon (egress gateway) — appears if egress picked, sits at cluster edge
+  // EGW hexagon (egress gateway), appears if egress picked, sits at cluster edge
   var egw=null, ingw=null;
   if(has("egress")){
     egw=hexNode(scene,440,400,30,"EGW","gw-egw");
@@ -718,7 +723,7 @@ function buildDiagram(){
   if(has("ingress"))bits.push("a protected ingress path");
   if(has("observability"))bits.push("full east-west and north-south flow visibility");
   var connTxt={connected:"with a public-facing edge",firewall:"reaching the internet through your firewall",airgapped:"running fully air-gapped"}[conn];
-  $("capBody").textContent="Two Calico-managed clusters with "+(bits.length?bits.join(", "):"a unified policy fabric")+" \u2014 "+connTxt+". Hover a flow below to trace how packets travel.";
+  $("capBody").textContent="Two Calico-managed clusters with "+(bits.length?bits.join(", "):"a unified policy fabric")+", "+connTxt+". Hover a flow below to trace how packets travel.";
 
   /* ---- staggered reveal then start packets ---- */
   anim.forEach(function(node,i){ setTimeout(function(){node.classList.add("in");},80+i*32); });
