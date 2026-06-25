@@ -51,7 +51,8 @@
   @keyframes breathe{0%,100%{filter:drop-shadow(0 0 16px var(--amber-soft)) drop-shadow(0 0 6px rgba(250,140,25,.35))}
     50%{filter:drop-shadow(0 0 26px rgba(250,140,25,.7)) drop-shadow(0 0 11px rgba(250,140,25,.5))}}
   @media (prefers-reduced-motion:reduce){.shieldImg{animation:none}}
-  #app.q .shieldWrap,#app.build .shieldWrap{transform:translate(-50%,-50%) translateY(-235px) scale(.6)}
+  #app.q .shieldWrap{transform:translate(-50%,-50%) translateY(-235px) scale(.6)}
+  #app.build .shieldWrap{opacity:0;visibility:hidden;pointer-events:none}
   #app.q .shieldImg,#app.build .shieldImg{animation:none;filter:drop-shadow(0 0 10px var(--amber-soft))}
 
   /* ---- landing prompt ---- */
@@ -109,7 +110,7 @@
   .stage{position:absolute;inset:0;z-index:20;display:none}
   #app.build .stage{display:block}
   .diagram-wrap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-    width:min(1120px,96vw)}
+    width:min(1040px,calc(100vw - 600px))}
   .diagram-svg{width:100%;height:auto;display:block;overflow:visible}
 
   /* summary chips top-left of stage */
@@ -118,6 +119,8 @@
   .chip{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;margin:0 6px 6px 0;border-radius:7px;
     background:var(--panel);border:1px solid rgba(140,150,170,.2);font-size:11.5px;color:var(--label)}
   .chip.edge{border-color:rgba(224,180,69,.4);color:var(--warn)}
+  .sharebtn{margin-top:12px;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid rgba(154,184,255,.32);background:rgba(40,46,62,.55);color:#9AB8FF;font-size:11.5px;font-weight:600;cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+  .sharebtn:hover{background:rgba(48,56,78,.85);border-color:rgba(154,184,255,.6);color:#C2D5FF}
 
   /* flow-trace legend (top-right) */
   .toggle-wrap{position:absolute;top:96px;right:40px;z-index:30;text-align:right}
@@ -282,7 +285,6 @@
       <div class="caption" id="caption">
         <h3 id="capTitle"></h3>
         <p id="capBody"></p>
-        <span class="vet">Placeholder copy, pending marketing review</span>
       </div>
       <button class="restart" id="restartBtn">&#8635; Start over</button>
     </div>
@@ -298,21 +300,62 @@ function $(id){return document.getElementById(id);}
 /* ---------------- DATA MODEL ---------------- */
 var INDUSTRIES=[
   {id:"finance",name:"Finance",sub:"Banking, trading, fintech"},
-  {id:"healthcare",name:"Healthcare",sub:"Coming soon",soon:true},
-  {id:"fnb",name:"Food & Beverage",sub:"Coming soon",soon:true},
-  {id:"govt",name:"Government",sub:"Coming soon",soon:true},
-  {id:"utilities",name:"Utilities",sub:"Coming soon",soon:true},
-  {id:"other",name:"Other",sub:"Coming soon",soon:true}
+  {id:"healthcare",name:"Healthcare",sub:"Providers, payers, health-tech"},
+  {id:"fnb",name:"Food & Beverage",sub:"Retail, POS, e-commerce"},
+  {id:"govt",name:"Government",sub:"Public sector, defense"},
+  {id:"utilities",name:"Utilities",sub:"Energy, grid, OT"},
+  {id:"other",name:"SaaS / Other",sub:"Multi-tenant platforms"}
 ];
+
+/* Per-industry profiles: cluster + namespace + workload labels, sensible defaults, and the
+   real driver for each vertical (grounded in Tigera customer stories + industry research). */
+var INDUSTRY_PROFILES={
+  finance:{clusterA:"Production Cluster",clusterB:"DR / Analytics Cluster",
+    ns:["ns: payments","ns: web","ns: risk-analytics","ns: cache"],
+    pods:["payments-api","ledger-db","storefront","risk-etl","redis"],
+    defaults:["egress","ingress","microseg","observability","compliance"],conn:"connected",
+    title:"A Finance reference topology",
+    driver:"Built to isolate the cardholder data environment and stand up to PCI-DSS and SOC 2 audits."},
+  healthcare:{clusterA:"Production Cluster",clusterB:"Analytics / Research Cluster",
+    ns:["ns: ehr","ns: patient-portal","ns: imaging","ns: integration"],
+    pods:["fhir-api","records-db","portal","imaging","hl7-gw"],
+    defaults:["microseg","compliance","observability","encryption"],conn:"connected",
+    title:"A Healthcare reference topology",
+    driver:"Built to isolate PHI, prove HIPAA compliance, and show exactly what touched patient data."},
+  fnb:{clusterA:"Production Cluster",clusterB:"Analytics Cluster",
+    ns:["ns: payments","ns: storefront","ns: orders","ns: inventory"],
+    pods:["pos-api","payments-db","storefront","orders-etl","inventory"],
+    defaults:["egress","ingress","microseg","observability","compliance"],conn:"connected",
+    title:"A Food & Beverage reference topology",
+    driver:"Built to keep point-of-sale and e-commerce PCI-compliant while controlling what leaves the cluster."},
+  govt:{clusterA:"Production Cluster",clusterB:"Analytics Cluster",
+    ns:["ns: citizen-services","ns: public-portal","ns: records","ns: data"],
+    pods:["services-api","records-db","portal","etl","cache"],
+    defaults:["microseg","compliance","threat","observability","encryption"],conn:"airgapped",
+    title:"A Government reference topology",
+    driver:"Built for zero-trust under FedRAMP and NIST 800-53, with continuous monitoring and an air-gapped option."},
+  utilities:{clusterA:"IT Cluster",clusterB:"OT / Telemetry Cluster",
+    ns:["ns: grid-apps","ns: web","ns: telemetry","ns: historian"],
+    pods:["control-api","scada-gw","portal","telemetry","historian"],
+    defaults:["microseg","threat","observability","egress"],conn:"firewall",
+    title:"A Utilities reference topology",
+    driver:"Built to keep a hard IT/OT boundary, detect threats east-west, and isolate each team."},
+  other:{clusterA:"Production Cluster",clusterB:"Analytics Cluster",
+    ns:["ns: tenant-a","ns: tenant-b","ns: shared-svcs","ns: data"],
+    pods:["tenant-a-api","tenant-a-db","gateway","tenant-b-api","cache"],
+    defaults:["microseg","ingress","observability","egress"],conn:"connected",
+    title:"A multi-tenant SaaS reference topology",
+    driver:"Built to isolate every tenant with identity-based policy and prove the separation."}
+};
 
 /* Use cases reverse-engineered from what a Finance shop needs.
    Each maps to a Calico capability + a component that gets added to the diagram. */
 var USECASES=[
   {id:"egress",label:"Control egress traffic",od:"Know exactly what leaves the cluster",defaultOn:true},
   {id:"ingress",label:"Protect ingress & APIs",od:"WAF + gateway for public-facing services",defaultOn:true},
-  {id:"microseg",label:"Microsegmentation / zero-trust",od:"Isolate the cardholder data environment",defaultOn:true},
+  {id:"microseg",label:"Microsegmentation / zero-trust",od:"Limit lateral movement, default-deny",defaultOn:true},
   {id:"observability",label:"Flow visibility & forensics",od:"Prove what talked to what",defaultOn:true},
-  {id:"compliance",label:"Compliance & audit evidence",od:"PCI-DSS, SOC 2 reporting",defaultOn:false},
+  {id:"compliance",label:"Compliance & audit evidence",od:"PCI-DSS, HIPAA, SOC 2, FedRAMP",defaultOn:false},
   {id:"threat",label:"Threat defense (IDS/IPS)",od:"Detect known-bad traffic",defaultOn:false},
   {id:"encryption",label:"Encryption in transit",od:"WireGuard node-to-node",defaultOn:false}
 ];
@@ -332,11 +375,17 @@ var app=$("app");
 function renderIndustry(){
   var box=$("industryOpts");box.innerHTML="";
   INDUSTRIES.forEach(function(o){
-    var d=document.createElement("div");d.className="opt"+(o.soon?" soon":"");
-    d.innerHTML=o.name+(o.soon?'<span class="soon-tag">Coming soon</span>':'<span class="od">'+o.sub+'</span>');
-    if(!o.soon){d.onclick=function(){
+    var d=document.createElement("div");d.className="opt";
+    d.innerHTML=o.name+'<span class="od">'+o.sub+'</span>';
+    if(state.industry===o.id)d.classList.add("sel");
+    d.onclick=function(){
       Array.prototype.forEach.call(box.children,function(c){c.classList.remove("sel");});
-      d.classList.add("sel");state.industry=o.id;refreshNav();};}
+      d.classList.add("sel");
+      state.industry=o.id;
+      var p=INDUSTRY_PROFILES[o.id];
+      if(p){ state.usecases=p.defaults.slice(); state.connectivity=p.conn; }
+      refreshNav();
+    };
     box.appendChild(d);
   });
 }
@@ -398,13 +447,8 @@ function industryName(id){for(var i=0;i<INDUSTRIES.length;i++)if(INDUSTRIES[i].i
 /* ---------------- NAV WIRING ---------------- */
 $("startBtn").onclick=function(){
   app.className="q";
-  // preselect Finance defaults so the wizard feels alive
-  if(!state.industry){state.industry="finance";}
-  if(state.usecases.length===0){USECASES.forEach(function(u){if(u.defaultOn)state.usecases.push(u.id);});}
+  if(!state.industry){ state.industry="finance"; var p=INDUSTRY_PROFILES.finance; state.usecases=p.defaults.slice(); state.connectivity=p.conn; }
   renderIndustry();renderUsecases();renderConn();
-  // mark finance selected
-  Array.prototype.forEach.call($("industryOpts").children,function(c){
-    if(c.textContent.indexOf("Finance")===0)c.classList.add("sel");});
   showStep(0);
 };
 $("nextBtn").onclick=function(){
@@ -591,6 +635,7 @@ function buildDiagram(){
   clearDiagram();
   var uc=state.usecases, conn=state.connectivity;
   var has=function(id){return uc.indexOf(id)>=0;};
+  var P=INDUSTRY_PROFILES[state.industry]||INDUSTRY_PROFILES.finance;
 
   var scene=el("g",null,"scene-g");
   diagram.appendChild(scene);
@@ -599,14 +644,14 @@ function buildDiagram(){
   scene.appendChild(L_bg); scene.appendChild(L_link); scene.appendChild(L_pkt); scene.appendChild(L_node);
 
   /* ---- CLUSTER A (left, primary) : 2 namespaces ---- */
-  var cA=clusterBox(scene,60,150,430,340,"Production Cluster");
+  var cA=clusterBox(scene,60,150,430,340,P.clusterA);
   // namespace: payments
-  var nsPay=nsBox(scene,84,196,180,250,"ns: payments");
-  var podPay1=hexNode(scene,150,255,26,"api","app");
-  var podPay2=hexNode(scene,150,360,26,"db","app");
+  var nsPay=nsBox(scene,84,196,180,250,P.ns[0]);
+  var podPay1=hexNode(scene,150,255,26,P.pods[0],"app");
+  var podPay2=hexNode(scene,150,360,26,P.pods[1],"app");
   // namespace: web
-  var nsWeb=nsBox(scene,286,196,180,130,"ns: web");
-  var podWeb1=hexNode(scene,376,262,26,"web","app");
+  var nsWeb=nsBox(scene,286,196,180,130,P.ns[1]);
+  var podWeb1=hexNode(scene,376,262,26,P.pods[2],"app");
   // EGW hexagon (egress gateway), appears if egress picked, sits at cluster edge
   var egw=null, ingw=null;
   if(has("egress")){
@@ -617,11 +662,11 @@ function buildDiagram(){
   }
 
   /* ---- CLUSTER B (right) : 2 namespaces ---- */
-  var cB=clusterBox(scene,560,210,330,250,"DR / Analytics Cluster");
-  var nsAna=nsBox(scene,580,250,140,190,"ns: analytics");
-  var podAna1=hexNode(scene,650,312,24,"etl","app");
-  var nsCache=nsBox(scene,738,250,134,190,"ns: cache");
-  var podCache1=hexNode(scene,805,312,24,"redis","app");
+  var cB=clusterBox(scene,560,224,330,178,P.clusterB);
+  var nsAna=nsBox(scene,580,256,140,120,P.ns[2]);
+  var podAna1=hexNode(scene,650,312,24,P.pods[3],"app");
+  var nsCache=nsBox(scene,738,256,134,120,P.ns[3]);
+  var podCache1=hexNode(scene,805,312,24,P.pods[4],"app");
 
   /* ---- EDGE: firewall + internet, shaped by connectivity ---- */
   var fwLabel,fwKind,showInternet;
@@ -710,20 +755,22 @@ function buildDiagram(){
   USECASES.forEach(function(u){if(has(u.id))html+='<span class="chip">'+u.label+'</span>';});
   var cn=CONNECTIVITY.filter(function(c){return c.id===conn;})[0];
   if(cn)html+='<span class="chip edge">'+cn.label+'</span>';
+  html+='<button class="sharebtn" id="shareBtn">\u29C9 Copy share link</button>';
   sum.innerHTML=html;
+  var sb=$("shareBtn"); if(sb)sb.onclick=shareLink;
 
   /* ---- flow spotlight legend (replaces the old K8s/Calico toggle) ---- */
   buildFlowLegend(has,conn);
 
   /* ---- caption ---- */
-  $("capTitle").textContent="A "+industryName(state.industry)+" reference topology";
+  $("capTitle").textContent=P.title;
   var bits=[];
   if(has("microseg"))bits.push("zero-trust segmentation between namespaces");
   if(has("egress"))bits.push("a fixed-IP egress gateway");
   if(has("ingress"))bits.push("a protected ingress path");
   if(has("observability"))bits.push("full east-west and north-south flow visibility");
   var connTxt={connected:"with a public-facing edge",firewall:"reaching the internet through your firewall",airgapped:"running fully air-gapped"}[conn];
-  $("capBody").textContent="Two Calico-managed clusters with "+(bits.length?bits.join(", "):"a unified policy fabric")+", "+connTxt+". Hover a flow below to trace how packets travel.";
+  $("capBody").textContent="Two Calico-managed clusters with "+(bits.length?bits.join(", "):"a unified policy fabric")+", "+connTxt+". "+P.driver+" Hover a flow below to trace how packets travel.";
 
   /* ---- staggered reveal then start packets ---- */
   anim.forEach(function(node,i){ setTimeout(function(){node.classList.add("in");},80+i*32); });
@@ -831,6 +878,25 @@ function highlightChip(active){
   });
 }
 
+function shareLink(){
+  var hash="#"+[state.industry,(state.usecases||[]).join("."),state.connectivity||""].join("/");
+  try{history.replaceState(null,"",location.pathname+location.search+hash);}catch(e){location.hash=hash;}
+  var btn=$("shareBtn");
+  function done(){ if(btn){var o=btn.innerHTML;btn.innerHTML="\u2713 Link copied";setTimeout(function(){btn.innerHTML=o;},1800);} }
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(location.href).then(done,done);} else {done();}
+}
+function applyHash(){
+  var m=(location.hash||"").replace(/^#/,"");
+  if(!m)return false;
+  var parts=m.split("/");
+  if(!parts[0]||!INDUSTRY_PROFILES[parts[0]])return false;
+  state.industry=parts[0];
+  state.usecases=(parts[1]?parts[1].split("."):[]).filter(function(x){return x;});
+  state.connectivity=parts[2]||INDUSTRY_PROFILES[parts[0]].conn;
+  renderIndustry();renderUsecases();renderConn();
+  goBuild();
+  return true;
+}
 function goBuild(){
   app.className="build";
   $("stage").setAttribute("data-view","logical");
@@ -849,8 +915,7 @@ function wireViewToggle(){
   tc.onclick=function(){$("stage").setAttribute("data-view","calico");tc.classList.add("on");tl.classList.remove("on");};
 }
 wireViewToggle();
-
-
+applyHash();
 })();
 
 </script>
