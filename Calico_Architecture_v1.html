@@ -695,12 +695,14 @@ function build(){
   var kernRef={_cx:kx,_cy:ky,_w:164,_h:58};
 
   // ---- Observability (OSS, advanced) / Commercial (CE+Cloud) share the lower-right slot ----
-  var obsBand=boundary(arch,928,290,340,92,"bound-ctl","Observability (OSS, 3.30+)","");obsBand.classList.add("oss-obs-band");
-  var goldmane=comp(arch,"goldmane",1013,340,150,48);
-  var whisker=comp(arch,"whisker",1183,340,150,48);
-  var manager=comp(arch,"manager",1013,340,150,48);
-  var threat=comp(arch,"threatdefense",1183,340,150,48);
-  var commLabel=el("text",{x:944,y:284,fill:"#9CA3AF","font-size":"11","text-anchor":"start"},"comm-label");
+  var obsBand=boundary(arch,928,286,340,104,"bound-ctl","Observability (OSS, 3.30+)","");obsBand.classList.add("oss-obs-band");
+  var goldmane=comp(arch,"goldmane",1013,354,150,46);
+  var whisker=comp(arch,"whisker",1183,354,150,46);
+  var manager=comp(arch,"manager",1013,354,150,46);
+  var threat=comp(arch,"threatdefense",1183,354,150,46);
+  // these four sit inside a clearly-labeled section, so drop the redundant per-box "OPTIONAL" tag (it also collided with the band title)
+  [goldmane,whisker,manager,threat].forEach(function(g){var t=g.querySelector(".opt-tag");if(t)t.remove();});
+  var commLabel=el("text",{x:944,y:282,fill:"#9CA3AF","font-size":"11","text-anchor":"start"},"comm-label");
   commLabel.textContent="Commercial add-ons (Enterprise / Cloud)";arch.appendChild(commLabel);
   commLabel.style.display="none";
 
