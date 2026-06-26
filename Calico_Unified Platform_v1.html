@@ -116,7 +116,7 @@
      never short of its dot mid-animation; the pulse dashes carry the motion */
   .circuit-lines{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .7s ease}
   #app.focus .circuit-lines{opacity:1}
-  .trace{fill:none;stroke:var(--trace-dim);stroke-width:1.6;stroke-linecap:round}
+  .trace{fill:none;stroke:rgba(154,184,255,.5);stroke-width:1.8;stroke-linecap:round}
   .pulse{fill:none;stroke:var(--trace-bright);stroke-width:2;stroke-linecap:round;stroke-dasharray:7 93;stroke-dashoffset:100;filter:drop-shadow(0 0 3px var(--trace-bright))}
   @media (prefers-reduced-motion:no-preference){.pulse{animation:flow linear infinite}}
   @keyframes flow{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
