@@ -96,7 +96,7 @@
   #app.stack .shieldWrap{transform:translate(-50%,-50%) translateY(-228px) scale(.66)}
   /* drill-in: shield glides up to dock beside the title (same anchor -> smooth tween) */
   #app.focus .shieldWrap,#app.build .shieldWrap{
-    transform:translate(-50%,-50%) translateY(calc(-380px + 50px)) translateX(-225px) scale(.4);opacity:.92}
+    transform:translate(-50%,-50%) translateY(calc(-350px + 50px)) translateX(-225px) scale(.4);opacity:.92}
   #app.focus .shieldImg,#app.build .shieldImg{animation:none;filter:drop-shadow(0 0 10px rgba(250,140,25,.5))}
   #app.focus .shieldWrap:hover .shieldImg,#app.build .shieldWrap:hover .shieldImg{filter:drop-shadow(0 0 18px rgba(250,140,25,.85))}
   #app.focus .shieldWrap,#app.build .shieldWrap{cursor:pointer}
@@ -112,15 +112,17 @@
     transform:translateY(-50%);z-index:15;opacity:0;pointer-events:none}
   #app.focus .circuit{opacity:1;pointer-events:none}
   #app.focus .endpoint.drillable{pointer-events:auto}
-  .circuit-lines{position:absolute;inset:0;width:100%;height:100%;transform:scaleX(0);transform-origin:left center;transition:transform .9s cubic-bezier(.22,.61,.36,1)}
-  #app.focus .circuit-lines{transform:scaleX(1)}
+  /* lines fade in at full length (no horizontal "grow" sweep) so a line end is
+     never short of its dot mid-animation; the pulse dashes carry the motion */
+  .circuit-lines{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .7s ease}
+  #app.focus .circuit-lines{opacity:1}
   .trace{fill:none;stroke:var(--trace-dim);stroke-width:1.6;stroke-linecap:round}
   .pulse{fill:none;stroke:var(--trace-bright);stroke-width:2;stroke-linecap:round;stroke-dasharray:7 93;stroke-dashoffset:100;filter:drop-shadow(0 0 3px var(--trace-bright))}
   @media (prefers-reduced-motion:no-preference){.pulse{animation:flow linear infinite}}
   @keyframes flow{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
   /* anchor the DOT (first child, 11px) on the trace end at (dotx,it.y); label hangs below */
   .endpoint{position:absolute;transform:translate(-50%,-5.5px);text-align:center;opacity:0;transition:opacity .4s}
-  #app.focus .endpoint{opacity:1;transition-delay:1.02s}
+  #app.focus .endpoint{opacity:1;transition-delay:.45s}
   .dot{width:11px;height:11px;border-radius:50%;background:var(--trace-bright);box-shadow:0 0 9px var(--trace-bright);margin:0 auto}
   .ep-label{color:var(--label);font-size:14px;font-weight:600;white-space:nowrap;margin-top:7px}
   .ep-feature{color:var(--feature);font-size:11.5px;white-space:nowrap;margin-top:2px}
