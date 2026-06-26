@@ -83,7 +83,7 @@
   .slab[data-slab="security"]     {--c-top:#5C7AB8;--c-left:#445C92;--c-right:#36487A;--c-edge:#9DB4E0;--ty:-84px;--fx:900px;z-index:23}
   .slab[data-slab="networking"]   {--c-top:#6A66B0;--c-left:#4E4A8E;--c-right:#3B3870;--c-edge:#ABA8DC;--ty:-168px;--fx:-900px;z-index:24}
   .slab[data-slab="observability"]{--c-top:#7E66AE;--c-left:#5E4A8C;--c-right:#46376E;--c-edge:#BCA9DC;--ty:0px;--fx:-900px;z-index:22}
-  .slab[data-slab="vm"]           {--c-top:#9166AE;--c-left:#6D478E;--c-right:#503370;--c-edge:#C7A9DC;--ty:84px;--fx:900px;z-index:21}
+  .slab[data-slab="vm"]           {--c-top:#9166AE;--c-left:#6D478E;--c-right:#503370;--c-edge:#C7A9DC;--ty:170px;--fx:900px;z-index:21}
 
   .slab{transform:translate(calc(-50% + var(--fx)),calc(-50% + var(--ty)))}
   #app.stack .slab,#app.focus .slab{transform:translate(-50%,calc(-50% + var(--ty)));opacity:1}
@@ -186,9 +186,10 @@
     padding:22px 24px;box-shadow:0 18px 50px rgba(0,0,0,.45);
     opacity:0;transform:translateY(10px) scale(.985);pointer-events:none;
     transition:opacity .4s cubic-bezier(.22,.61,.36,1),transform .4s cubic-bezier(.22,.61,.36,1),left .5s,width .5s}
-  /* hero views: expansion drops below the card list (diagram untouched) */
-  #app.build:not(.cardsonly) .expand-panel{left:230px;top:600px;width:360px;padding:18px 20px}
-  #app.build:not(.cardsonly) .expand-panel .xp-body{font-size:12.5px;line-height:1.55}
+  /* build views: the expansion opens on the right (in the topology's space) and the
+     topology fades out, so the detail always fits on-screen and fills the width */
+  #app.build:not(.cardsonly) .expand-panel{left:600px;top:172px;width:444px}
+  #app.build:not(.cardsonly).has-active .buildc{opacity:0;pointer-events:none}
   .expand-panel.in{opacity:1;transform:none;pointer-events:auto}
   .expand-panel .xp-title{color:var(--title);font-size:17px;font-weight:600;margin-bottom:11px}
   .expand-panel .xp-body{color:#C4CBD9;font-size:13.5px;line-height:1.62}
@@ -1124,8 +1125,10 @@
     function fit(){
       var availW=window.innerWidth, availH=window.innerHeight;
       var scale=Math.min(availW/BASE_W, availH/BASE_H);
-      // never upscale past 1 (keeps text crisp); shrink as needed to fit
-      scale=Math.min(scale,1);
+      // scale up to fill the viewport (vector/CSS stays crisp), capped so it
+      // never gets absurd on very large displays. This removes the big empty
+      // side/bottom margins the fixed canvas used to leave on wide screens.
+      scale=Math.min(scale,2);
       stage.style.transform='scale('+scale+')';
     }
     fit();
