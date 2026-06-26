@@ -23,7 +23,7 @@
      positioned relative to it, and the whole thing is scaled to fit by JS.
      because all child elements keep their exact relative positions, resizing
      the container simply shrinks/grows the entire scene as one unit. */
-  #stage{position:relative;width:1280px;height:760px;flex:0 0 auto;
+  #stage{position:relative;width:1280px;height:700px;flex:0 0 auto;
     transform-origin:center center;background:var(--bg)}
 
   .topbar{position:absolute;top:34px;left:0;right:0;text-align:center;z-index:60;pointer-events:none}
@@ -93,7 +93,7 @@
   #app.stack .slab[data-slab="vm"]{transition-delay:.3s}
   #app.stack .slab:hover .edges,#app.focus .slab:hover .edges{stroke-width:2.6;opacity:1;filter:drop-shadow(0 0 9px var(--c-edge)) drop-shadow(0 0 3px var(--c-edge))}
 
-  #app.stack .shieldWrap{transform:translate(-50%,-50%) translateY(-258px) scale(.66)}
+  #app.stack .shieldWrap{transform:translate(-50%,-50%) translateY(-228px) scale(.66)}
   /* drill-in: shield glides up to dock beside the title (same anchor -> smooth tween) */
   #app.focus .shieldWrap,#app.build .shieldWrap{
     transform:translate(-50%,-50%) translateY(calc(-380px + 50px)) translateX(-225px) scale(.4);opacity:.92}
@@ -120,7 +120,7 @@
   @keyframes flow{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
   /* anchor the DOT (first child, 11px) on the trace end at (dotx,it.y); label hangs below */
   .endpoint{position:absolute;transform:translate(-50%,-5.5px);text-align:center;opacity:0;transition:opacity .4s}
-  #app.focus .endpoint{opacity:1;transition-delay:.85s}
+  #app.focus .endpoint{opacity:1;transition-delay:1.02s}
   .dot{width:11px;height:11px;border-radius:50%;background:var(--trace-bright);box-shadow:0 0 9px var(--trace-bright);margin:0 auto}
   .ep-label{color:var(--label);font-size:14px;font-weight:600;white-space:nowrap;margin-top:7px}
   .ep-feature{color:var(--feature);font-size:11.5px;white-space:nowrap;margin-top:2px}
@@ -1121,7 +1121,7 @@
   (function(){
     var stage=document.getElementById('stage');
     if(!stage) return;
-    var BASE_W=1280, BASE_H=760;
+    var BASE_W=1280, BASE_H=700;
     function fit(){
       var availW=window.innerWidth, availH=window.innerHeight;
       var scale=Math.min(availW/BASE_W, availH/BASE_H);
