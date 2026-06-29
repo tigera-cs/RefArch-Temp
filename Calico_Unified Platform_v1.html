@@ -1124,19 +1124,25 @@
     var stage=document.getElementById('stage');
     if(!stage) return;
     var BASE_W=1280, BASE_H=700;
+    // Container-aware: measure the element the stage lives in, not the window.
+    // Standalone / iframe -> the host is the page body (= the viewport), so this
+    // behaves exactly as before. Embedded inline in a page region -> it scales
+    // to that region instead of the whole window. Set the host's width/height
+    // (or use an aspect-ratio wrapper) and the diagram fills it.
     function fit(){
-      var availW=window.innerWidth, availH=window.innerHeight;
+      var host=stage.parentElement||document.documentElement;
+      var availW=host.clientWidth||window.innerWidth;
+      var availH=host.clientHeight||window.innerHeight;
       var scale=Math.min(availW/BASE_W, availH/BASE_H);
-      // scale up to fill the viewport (vector/CSS stays crisp), capped so it
-      // never gets absurd on very large displays. This removes the big empty
-      // side/bottom margins the fixed canvas used to leave on wide screens.
+      // scale up to fill the area (vector/CSS stays crisp), capped so it never
+      // gets absurd on very large displays.
       scale=Math.min(scale,2);
       stage.style.transform='scale('+scale+')';
     }
     fit();
     window.addEventListener('resize', fit);
     if(window.ResizeObserver){
-      try{ new ResizeObserver(fit).observe(document.documentElement); }catch(e){}
+      try{ new ResizeObserver(fit).observe(stage.parentElement||document.documentElement); }catch(e){}
     }
   })();
 </script>
