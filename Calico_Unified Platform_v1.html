@@ -1151,6 +1151,10 @@
     if(state==='build'){ if(e.target.closest('.build-text')||e.target.closest('.expand-panel')) return; backOne(); return; }
   });
 
+  /* auto-enter: skip the landing "click the shield" step and play the stack-forming
+     animation on load (keeps the shield: it glides up to its crown as the slabs assemble) */
+  requestAnimationFrame(function(){ setTimeout(function(){ if(app.className.split(' ')[0]==='landing') goStack(); }, 360); });
+
   /* ---- fit the fixed-size stage into whatever container holds it ----
      The stage has a fixed internal coordinate space (1280x760). We scale it
      uniformly so it always fits the visible area (window or embed iframe),
