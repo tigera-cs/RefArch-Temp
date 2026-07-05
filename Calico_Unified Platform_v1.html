@@ -321,6 +321,8 @@
   /* ===== Lena UX: Unified pillar EXPLORE affordance + hide docked shield in focus/build ===== */
   #app.stack .slab .explore{opacity:.82;transform:translate(-50%,-50%) skewY(-13.7deg) scaleY(.96) translateY(0)}
   #app.focus .shieldWrap,#app.build .shieldWrap{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+  /* remove the traveling pulse dashes on the pillar circuit (they read as the line not reaching its dot) */
+  .circuit-lines .pulse{display:none}
 </style>
 </head>
 <body>
