@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Calico Architecture: How Calico Sits in Your Cluster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem("refarch-theme")||"light";document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","light");}})();</script>
 <style>
   :root{
     --bg:#1A1D24; --panel:#21252E; --panel-2:#272C37;
@@ -16,7 +20,7 @@
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;background:var(--bg);color:var(--label);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;overflow:hidden}
+    font-family:'DM Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;overflow:hidden}
   .topbar{position:absolute;top:26px;left:0;right:0;text-align:center;z-index:60;pointer-events:none}
   .topbar h1{margin:0;color:var(--title);font-size:25px;font-weight:600;letter-spacing:.01em}
   .topbar p{color:var(--subtitle);font-size:13px;margin-top:6px;letter-spacing:.06em}
@@ -268,6 +272,55 @@
   .vp-card h2{color:#F3F4F6;font-size:22px;font-weight:700;margin:0 0 12px}
   .vp-card p{color:#9CA3AF;font-size:15px;line-height:1.6;margin:0}
   @media (max-width:900px),(max-height:460px){.vp-gate{display:flex}}
+
+  /* ===== LIGHT THEME (default), additive; dark base stays intact ===== */
+  :root[data-theme="light"]{
+    --bg:#FFFFFF;--panel:#F2F4F8;--panel-2:#E9EDF4;
+    --title:#1A1D24;--subtitle:#586173;--label:#23262E;--feature:#6B7280;
+    --amber-soft:rgba(250,140,25,.28);
+    --line:#8298CC;--line-bright:#3D6FB0;
+    --k8s:#3D6FB0;--k8s-deep:#2E548A;--node-edge:#5C7AB8;--ok:#1E9E6A;--warn:#9A6B10;--crd:#7E5FA8;
+  }
+  [data-theme="light"] .topnav{background:rgba(255,255,255,.85);border-bottom-color:rgba(20,30,60,.1)}
+  [data-theme="light"] .tn-tabs{background:rgba(20,30,60,.04);border-color:rgba(20,30,60,.12)}
+  [data-theme="light"] .ctrlstrip{background:rgba(20,30,60,.035);border-color:rgba(20,30,60,.1)}
+  [data-theme="light"] .tiertoggle{background:#fff;border-color:rgba(20,30,60,.18)}
+  [data-theme="light"] .tiertoggle button{color:#586173}
+  [data-theme="light"] .tiertoggle button.on{background:rgba(250,140,25,.14);color:#B4610A}
+  [data-theme="light"] .wfmenu{background:#fff;border-color:rgba(20,30,60,.14);box-shadow:0 18px 50px rgba(20,30,60,.16)}
+  [data-theme="light"] .wfmenu button{color:#23262E}
+  [data-theme="light"] .wfmenu button:hover{background:rgba(20,30,60,.05)}
+  [data-theme="light"] .wfend{background:rgba(20,30,60,.04);border-color:rgba(20,30,60,.18);color:#23262E}
+  [data-theme="light"] .panel{background:#fff;border-color:rgba(20,30,60,.12);box-shadow:0 18px 50px rgba(20,30,60,.14)}
+  [data-theme="light"] .panel .p-close{background:rgba(20,30,60,.05);border-color:rgba(20,30,60,.15);color:#586173}
+  [data-theme="light"] .panel .p-where{background:rgba(20,30,60,.05)}
+  [data-theme="light"] .crd-chip{background:rgba(20,30,60,.05);border-color:rgba(20,30,60,.12);color:#3A4560}
+  [data-theme="light"] .tier-toast{background:rgba(255,255,255,.97);color:#B4610A;border-color:rgba(250,140,25,.42)}
+  [data-theme="light"] .at-sw{background:rgba(20,30,60,.2)}
+  [data-theme="light"] .legend{background:rgba(20,30,60,.02);border-color:rgba(20,30,60,.08)}
+  [data-theme="light"] .comp .cbox{fill:#E5EDFB}
+  [data-theme="light"] .comp:hover .cbox{fill:#D3E1F7}
+  [data-theme="light"] .comp.optional .cbox{fill:#EEF2F9;stroke:rgba(93,124,184,.5)}
+  [data-theme="light"] .comp .ctitle{fill:#1B3A6B}
+  [data-theme="light"] .comp .csub{fill:#4A6497}
+  [data-theme="light"] .comp.optional .ctitle{fill:#3A5488}
+  [data-theme="light"] .comp.wt-hi .cbox{fill:#FCE7CB}
+  [data-theme="light"] .datastore .dbox{fill:#EFE7F8}
+  [data-theme="light"] .datastore .dtitle{fill:#4A2E6E}
+  [data-theme="light"] .datastore .dsub{fill:#6E5595}
+  [data-theme="light"] .bound-rect{fill:rgba(20,30,60,.025)}
+  [data-theme="light"] .bound-cluster{stroke:rgba(93,124,184,.45)}
+  [data-theme="light"] .bound-node{stroke:rgba(93,124,184,.5);fill:rgba(93,124,184,.04)}
+  [data-theme="light"] .bound-ctl{stroke:rgba(126,102,174,.45);fill:rgba(126,102,174,.045)}
+  [data-theme="light"] .kernode .kbox{fill:#EEF1F6;stroke:rgba(93,124,184,.45)}
+  [data-theme="light"] .kernode text{fill:#4A6497}
+  [data-theme="light"] .actor circle{fill:#F2F4F8;stroke:#8894a8}
+  [data-theme="light"] .actor text{fill:#586173}
+  [data-theme="light"] .xn rect{fill:rgba(61,111,176,.12);stroke:#3D6FB0}
+  [data-theme="light"] .xn text{fill:#2E548A}
+  /* theme toggle in nav */
+  .tn-theme{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid rgba(140,150,170,.28);background:transparent;color:var(--subtitle);cursor:pointer;padding:0;transition:background .2s,border-color .2s,color .2s}.tn-theme:hover{color:var(--label)}.tn-theme .ti-sun,.tn-theme .ti-moon{display:none}[data-theme="light"] .tn-theme .ti-sun{display:block}[data-theme="dark"] .tn-theme .ti-moon{display:block}
+  .tn-theme:hover{background:rgba(140,150,170,.14)}
 </style>
 </head>
 <body>
@@ -284,6 +337,7 @@
       <a class="tn-tab" href="Calico_Unified_Platform_v1.html">Unified Platform</a>
     </div>
     <div class="tn-cta">
+      <button class="tn-theme" id="themeToggle" aria-label="Switch between dark and light mode" title="Toggle theme"><svg class="ti-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"/></svg><svg class="ti-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"/></svg></button>
       <a class="tn-link" href="https://www.tigera.io/demo/" target="_blank" rel="noopener noreferrer">Book a Demo <span class="tn-ext">&#8599;</span></a>
       <a class="tn-link" href="https://www.tigera.io/contact/" target="_blank" rel="noopener noreferrer">Contact Us <span class="tn-ext">&#8599;</span></a>
     </div>
@@ -778,7 +832,7 @@ function build(){
 
   // ---- Data plane lane (per node), single clean boundary; the "x N" badge conveys repetition ----
   boundary(arch,140,236,770,200,"bound-node","Data plane","");
-  var rep=el("g",null,null);
+  var rep=el("g",null,"xn");
   rep.appendChild(el("rect",{x:786,y:244,width:110,height:24,rx:12,fill:"rgba(91,141,239,.18)",stroke:"var(--k8s)","stroke-width":1}));
   var rt=el("text",{x:841,y:260,fill:"#CFE0FF","font-size":"12.5","font-weight":"700","text-anchor":"middle"});rt.textContent="× N nodes";rep.appendChild(rt);
   arch.appendChild(rep);
@@ -875,5 +929,6 @@ build();
 })();
 
 </script>
+<script>(function(){var b=document.getElementById("themeToggle");if(!b)return;b.addEventListener("click",function(){var cur=document.documentElement.getAttribute("data-theme");var nxt=(cur==="dark")?"light":"dark";document.documentElement.setAttribute("data-theme",nxt);try{localStorage.setItem("refarch-theme",nxt);}catch(e){}});})();</script>
 </body>
 </html>
