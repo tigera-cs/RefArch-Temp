@@ -10,7 +10,7 @@ copy changes get made.
 |------|------|------|
 | Architecture | https://tigera-cs.github.io/RefArch-Temp/Calico_Architecture_v1.html | `Calico_Architecture_v1.html` |
 | Envision | https://tigera-cs.github.io/RefArch-Temp/Calico_Envision_v1.html | `Calico_Envision_v1.html` |
-| Unified Platform | https://tigera-cs.github.io/RefArch-Temp/Calico_Unified%20Platform_v1.html | `Calico_Unified Platform_v1.html` |
+| Unified Platform | https://tigera-cs.github.io/RefArch-Temp/Calico_Unified_Platform_v1.html | `Calico_Unified_Platform_v1.html` |
 
 Each is a single self-contained HTML file: inline CSS + JS, images embedded as data URIs,
 no build step, no external dependencies, no network calls. The logic is finished and tested.
@@ -33,7 +33,7 @@ Suggested markup (responsive, keeps the landscape aspect):
 <div style="max-width:1180px;margin:0 auto;">
   <div style="position:relative;width:100%;aspect-ratio:16/9;">
     <iframe
-      src="https://tigera-cs.github.io/RefArch-Temp/Calico_Unified%20Platform_v1.html"
+      src="https://tigera-cs.github.io/RefArch-Temp/Calico_Unified_Platform_v1.html"
       title="Calico Unified Platform"
       loading="lazy"
       style="position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:12px;"
