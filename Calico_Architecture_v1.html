@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
-<script>(function(){try{var t=localStorage.getItem("refarch-theme")||"light";document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","light");}})();</script>
+<script>(function(){try{var t=localStorage.getItem("refarch-theme")||"dark";document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","light");}})();</script>
 <style>
   :root{
     --bg:#1A1D24; --panel:#21252E; --panel-2:#272C37;
@@ -364,7 +364,7 @@
       <button class="wfbtn" id="wfbtn">Explore a Workflow <span class="caret">&#9662;</span></button>
       <div class="wfmenu" id="wfmenu">
         <button data-j="pod">How a pod gets connected</button>
-        <button data-j="policy">How a policy becomes enforcement</button>
+        <button data-j="policy">How a policy is enforced</button>
       </div>
       <button class="wfend" id="wfend">End Workflow Exploration <span class="x">&times;</span></button>
     </div>
@@ -414,7 +414,7 @@ function $(id){return document.getElementById(id);}
    where: residence string. role: plain-language. doc: docs link. */
 var DOC="https://docs.tigera.io/calico/latest/reference/architecture/overview";
 var COMPONENTS={
-  felix:{name:"Felix",where:"calico/node DaemonSet \u00b7 every node",core:true,tier:"oss",
+  felix:{name:"Felix",where:"calico-node DaemonSet \u00b7 every node",core:true,tier:"oss",
     role:"The per-node agent. Programs routes, ACLs and interfaces into the Linux kernel so each pod gets the connectivity and policy it should, and reports node health back to the datastore.",
     doc:"https://docs.tigera.io/calico/latest/reference/architecture/overview#felix"},
   bird:{name:"BIRD",where:"calico/node \u00b7 every node (BGP mode)",core:false,tier:"oss",
@@ -621,17 +621,14 @@ function selectKernel(grp){
     '<span class="p-where">where Felix programs the kernel</span>'+
     '<p>This is the kernel datapath where Felix writes routes and ACLs. Calico is dataplane-pluggable, so you choose how policy and routing are enforced, and the policy model stays the same whichever you pick.</p>'+
     '<div class="crd-group"><h4>Dataplane options</h4>'+
-      '<span class="crd-chip">standard Linux (iptables)</span>'+
-      '<span class="crd-chip">eBPF</span>'+
-      '<span class="crd-chip">nftables</span>'+
-      '<span class="crd-chip">VPP</span>'+
+      (function(){var dps=["standard Linux (iptables)","eBPF","nftables"];if(curTier==="oss")dps.push("VPP");dps.push("Windows (HNS)");return dps.map(function(d){return '<span class="crd-chip">'+d+'</span>';}).join('');})()+
     '</div>'+
     '<p class="p-default"><b>eBPF</b> brings higher throughput and lower latency, direct server return, and source-IP preservation, with no kube-proxy required.</p>'+
     '<a class="p-link" href="https://docs.tigera.io/calico/latest/operations/ebpf/use-cases-ebpf" target="_blank" rel="noopener">Read the docs ↗</a>';
 }
 
 /* P1: switching offering reveals what each edition gives you */
-var EDITION_ADDS=["DNS / FQDN policy","Hierarchical tiered policy","IDS / IPS","Deep packet inspection","Web application firewall","DDoS protection","Egress gateway","Cluster mesh & multi-cluster","Compliance reporting","SIEM integration","Manager UI & service graph","Dynamic packet capture"];
+var EDITION_ADDS=["DNS / FQDN policy","Hierarchical tiered policy","IDS / IPS","Deep packet inspection","Web application firewall","DDoS protection","Egress gateway","QoS controls","Cluster mesh & multi-cluster","Compliance reporting","SIEM integration","Manager UI & service graph","Dynamic packet capture"];
 var EDITION_VALUE={
   oss:{title:"Calico Open Source",where:"free & open source",h:"What you get",
     intro:"Best-in-class pod networking and full Kubernetes network policy, free and open source.",
@@ -683,7 +680,7 @@ function refreshVisibility(){
   var obs=arch.querySelector(".oss-obs-band"); if(obs)obs.style.display=obsShown?"":"none";
   gateLink(LINKS.goldWhisk, obsShown);
   gateLink(LINKS.confdBird, curDetail==="all");
-  var cl=arch.querySelector(".comm-label"); if(cl)cl.style.display=anyComm?"":"none";
+  var cl=arch.querySelector(".comm-label"); if(cl){cl.style.display=anyComm?"":"none";cl.textContent=(curTier==="cloud")?"☁ Managed by Tigera · SaaS":"Enterprise add-ons · self-managed in your cluster";}
 }
 function applyTier(tier){
   curTier=tier;
@@ -702,7 +699,7 @@ function applyDetail(mode){
 /* ---- WALKTHROUGH: two journeys that trace how Calico works ---- */
 var JOURNEYS={
   policy:{
-    label:"How a policy becomes enforcement",
+    label:"How a policy is enforced",
     steps:[
       {node:"actor",link:"youApi",cap:"<b>1. You write a policy.</b> You apply a NetworkPolicy (or Calico GlobalNetworkPolicy) with kubectl, a simple YAML rule describing who may talk to whom."},
       {node:"apiserver",link:"apiDs",cap:"<b>2. The API server accepts it.</b> Kubernetes (via the Calico API server) validates the rule and writes it to the datastore as a Calico resource."},
@@ -795,7 +792,7 @@ function updateWalkUI(){
   var other = wt.active==="policy" ? "pod" : "policy";
   var cap=$("wfCap"); if(!cap)return;
   if(atEnd){
-    cap.innerHTML=steps[wt.step].cap+'<span class="wf-nudge">✓ That’s the full path. <a href="#" id="wtOther">Trace “'+JOURNEYS[other].label+'” →</a></span>';
+    cap.innerHTML=steps[wt.step].cap+'<span class="wf-nudge">✓ That’s the full path. <a id="wtOther" role="button" style="cursor:pointer">Trace “'+JOURNEYS[other].label+'” →</a></span>';
     var ol=$("wtOther"); if(ol)ol.onclick=function(e){e.preventDefault();enterWorkflow(other);};
   } else {
     cap.innerHTML=steps[wt.step].cap;
@@ -849,7 +846,7 @@ function build(){
   var kx=800,ky=322;
   kern.appendChild(el("rect",{x:kx-82,y:ky-29,width:164,height:58,rx:8,fill:"rgba(40,46,62,.6)",stroke:"rgba(157,180,224,.4)","stroke-width":1.2,"stroke-dasharray":"3 3"},"kbox"));
   var kt=el("text",{x:kx,y:ky-5,fill:"#C7D4EC","font-size":"13.5","font-weight":"600","text-anchor":"middle"});kt.textContent="Linux kernel";kern.appendChild(kt);
-  var ks=el("text",{x:kx,y:ky+10,fill:"#9DB8E8","font-size":"10","text-anchor":"middle"});ks.textContent="iptables / eBPF dataplane";kern.appendChild(ks);
+  var ks=el("text",{x:kx,y:ky+10,fill:"#9DB8E8","font-size":"10","text-anchor":"middle"});ks.textContent="iptables / nftables / eBPF";kern.appendChild(ks);
   var kh=el("text",{x:kx,y:ky+33,fill:"#9DB8E8","font-size":"9","text-anchor":"middle"},"ds-hint");kh.textContent="▸ pluggable dataplane";kern.appendChild(kh);
   kern.addEventListener("click",function(){selectKernel(kern);});
   arch.appendChild(kern);
@@ -907,6 +904,7 @@ var TIER_TOAST={
 var toastTimer=null;
 function showTierToast(tier){
   var el2=$("tierToast"); if(!el2)return;
+  if(document.querySelector(".stage.wf-on"))return;
   el2.textContent=TIER_TOAST[tier]||"";
   el2.classList.add("show"); // persistent: stays until the next offering switch (Lena)
 }

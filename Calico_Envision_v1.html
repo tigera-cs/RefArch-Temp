@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
-<script>(function(){try{var t=localStorage.getItem("refarch-theme")||"light";document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","light");}})();</script>
+<script>(function(){try{var t=localStorage.getItem("refarch-theme")||"dark";document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","light");}})();</script>
 <style>
   :root{
     --bg:#1A1D24;
@@ -65,10 +65,10 @@
   .prompt .lead{color:var(--subtitle);font-size:16.5px;line-height:1.6;font-weight:400;letter-spacing:.01em}
   .prompt .lead b{color:var(--title);font-weight:600}
   .cta{margin-top:26px;display:inline-flex;align-items:center;gap:9px;padding:13px 30px;
-    border:1px solid var(--amber);border-radius:11px;background:rgba(250,140,25,.10);
-    color:#FFD9AC;font-size:15px;font-weight:600;letter-spacing:.04em;cursor:pointer;
+    border:1px solid var(--amber);border-radius:11px;background:var(--amber);
+    color:#1A1D24;font-size:15px;font-weight:600;letter-spacing:.04em;cursor:pointer;
     transition:background .25s,transform .25s,box-shadow .25s}
-  .cta:hover{background:rgba(250,140,25,.2);transform:translateY(-2px);box-shadow:0 8px 26px rgba(250,140,25,.18)}
+  .cta:hover{filter:brightness(1.08);transform:translateY(-2px);box-shadow:0 8px 26px rgba(250,140,25,.22)}
   .cta .arr{font-size:17px;transition:transform .25s}
   .cta:hover .arr{transform:translateX(4px)}
   #app:not(.landing) .prompt{opacity:0;pointer-events:none}
@@ -764,9 +764,9 @@ function link(g,a,b,kind,ortho,mode){
 }
 
 /* ---- packet animation ---- */
-function spawnPacket(path,kind,speed,delay){
+function spawnPacket(path,kind,speed,delay,burst){
   packets.push({path:path,kind:kind,len:path._len,t:-(delay||0),speed:speed||0.00018,
-    dot:null});
+    burst:!!burst,dot:null});
 }
 function ensureDot(pk){
   if(pk.dot)return pk.dot;
@@ -802,11 +802,13 @@ function setSpotlight(kind){
     p.classList.toggle("dim",!!kind && !on);
     p.classList.toggle("hot",!!kind && on);
   });
+  // clear prior burst packets so repeated flow clicks don't accumulate dots
+  packets=packets.filter(function(pk){if(pk.burst){if(pk.dot&&pk.dot.parentNode)pk.dot.parentNode.removeChild(pk.dot);return false;}return true;});
   // burst a few extra packets along the chosen kind
   if(kind && flowPaths[kind]){
     flowPaths[kind].forEach(function(p,i){
-      spawnPacket(p,kind,0.0004,i*0.15);
-      spawnPacket(p,kind,0.0004,i*0.15+0.4);
+      spawnPacket(p,kind,0.0004,i*0.15,true);
+      spawnPacket(p,kind,0.0004,i*0.15+0.4,true);
     });
   }
 }
