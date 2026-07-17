@@ -744,6 +744,7 @@ function enterWorkflow(j){
   wt.active=j; wt.step=0; closeWfMenu();
   var wb=$("wfbtn"), we=$("wfend"), ws=$("wfstep");
   if(wb)wb.style.display="none"; if(we)we.style.display="inline-flex"; if(ws)ws.classList.add("on");
+  var tt=$("tierToast"); if(tt)tt.classList.remove("show"); // dismiss persistent tier pill so it doesn't overlap the workflow title (both sit at top:150px)
   document.querySelector(".stage").classList.add("wf-on");
   applyWalkStep(); updateWalkUI();
 }
