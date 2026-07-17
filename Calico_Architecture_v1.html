@@ -567,7 +567,7 @@ function tick(ts){
   if(!lastTs)lastTs=ts;var dt=Math.min(60,ts-lastTs);lastTs=ts;
   packets.forEach(function(pk){
     if(pk._hide){ if(pk.dot)pk.dot.style.display="none"; return; }
-    pk.t+=0.00009*dt; if(pk.t>1)pk.t-=1;
+    pk.t+=0.00009*dt*(320/(pk.len||320)); if(pk.t>1)pk.t-=1; // length-normalized: uniform visual speed across links
     var pt=pk.path.getPointAtLength(pk.t*pk.len);
     if(!pk.dot){pk.dot=el("circle",{r:3},"cpacket");arch.appendChild(pk.dot);}
     pk.dot.style.display="";
@@ -806,8 +806,8 @@ function build(){
   // arrowhead + glow marker defs
   var defs=el("defs",null,null);
   function head(id,color){
-    var m=el("marker",{id:id,viewBox:"0 0 10 10",refX:"11",refY:"5",markerWidth:"5",markerHeight:"5",orient:"auto-start-reverse"});
-    m.appendChild(el("path",{d:"M0 1.5 L9 5 L0 8.5",fill:"none",stroke:color,"stroke-width":"1.6","stroke-linecap":"round","stroke-linejoin":"round"}));defs.appendChild(m);
+    var m=el("marker",{id:id,viewBox:"0 0 12 12",refX:"9.4",refY:"6",markerWidth:"11",markerHeight:"11",markerUnits:"userSpaceOnUse",orient:"auto-start-reverse"});
+    m.appendChild(el("path",{d:"M2.6 2.6 L9.4 6 L2.6 9.4",fill:"none",stroke:color,"stroke-width":"1.7","stroke-linecap":"round","stroke-linejoin":"round"}));defs.appendChild(m);
   }
   head("flowHead","rgba(154,184,255,.5)");
   head("flowHeadGreen","rgba(91,214,166,.5)");
@@ -825,7 +825,7 @@ function build(){
   var typha=comp(arch,"typha",810,146,150,58);
 
   // ---- Datastore: source-of-truth column on the right ----
-  var ds=datastore(arch,1080,150,232,120);
+  var ds=datastore(arch,1080,146,232,120);
 
   // ---- Data plane lane (per node), single clean boundary; the "x N" badge conveys repetition ----
   boundary(arch,140,236,770,200,"bound-node","Data plane","");
@@ -866,11 +866,11 @@ function build(){
 
   // ---- actor (you / kubectl) ----
   var actor=el("g",null,"actor");
-  actor.appendChild(el("circle",{cx:0,cy:0,r:16,fill:"rgba(40,46,62,.9)",stroke:"var(--feature)","stroke-width":1.3,transform:"translate(52,118)"}));
-  var au=el("text",{x:52,y:124,fill:"#C7D4EC","font-size":"16","text-anchor":"middle","font-weight":"700"});au.textContent="⌨";actor.appendChild(au);
-  var al=el("text",{x:52,y:152,fill:"#9CA3AF","font-size":"10.5","text-anchor":"middle"});al.textContent="you · kubectl";actor.appendChild(al);
+  actor.appendChild(el("circle",{cx:0,cy:0,r:16,fill:"rgba(40,46,62,.9)",stroke:"var(--feature)","stroke-width":1.3,transform:"translate(52,146)"}));
+  var au=el("text",{x:52,y:152,fill:"#C7D4EC","font-size":"16","text-anchor":"middle","font-weight":"700"});au.textContent="⌨";actor.appendChild(au);
+  var al=el("text",{x:52,y:180,fill:"#9CA3AF","font-size":"10.5","text-anchor":"middle"});al.textContent="you · kubectl";actor.appendChild(al);
   arch.appendChild(actor);
-  var actorRef={_cx:52,_cy:118,_w:32,_h:32};
+  var actorRef={_cx:52,_cy:146,_w:32,_h:32};
 
   // ---- control-flow links (keys preserved for the journeys) ----
   LINKS.operApi   = clink(arch,operator,apiserver,{from:"left",to:"right",noPacket:true,key:"operApi"});
